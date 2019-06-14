@@ -1,0 +1,16 @@
+---
+title: "ETL"
+author: "Leticia Suarez (202006) - Doris Medina (241578)"
+date: "13 de junio de 2019"
+output: html_document
+---
+
+```{r Inicio, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r Carga de datos}
+
+```
+
