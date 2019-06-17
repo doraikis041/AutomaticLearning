@@ -55,3 +55,22 @@ str(chefmozcuisine_clasificado)
 head(chefmozcuisine_clasificado)
 
 
+#Levantar datos de dias de atencion y guardar
+
+
+chefmozhours4_mod <- read.csv ("Dataset/chefmozhours4_modificado.csv", sep = ';')
+chefmozhours4_mod$Days1 <- ifelse(chefmozhours4_mod$Days1 == "Mon", 1, (chefmozhours4_mod$Days1))
+
+# se eliminan las columnas con los restantes dias de la semana (tue-fri) y las filas repetidas
+
+chefmozhours4_mod <- unique(chefmozhours4_mod[,-3:-6])
+
+
+#Levantar datos de parking y guardar
+
+
+chefmozparking <- read.csv ("Dataset/chefmozparking.csv", sep = ',')
+chefmozparking$parking_lot [chefmozparking$parking_lot == "street"] <- "none"
+chefmozparking$parking_lot <- (ifelse(chefmozparking$parking_lot == "none", 0, 1))
+
+
