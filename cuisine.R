@@ -66,11 +66,31 @@ chefmozhours4_mod$Days1 <- ifelse(chefmozhours4_mod$Days1 == "Mon", 1, (chefmozh
 chefmozhours4_mod <- unique(chefmozhours4_mod[,-3:-6])
 
 
+chefmozhours4_mod1 <- tidyr::spread(data = chefmozhours4_mod, key = Days1, value = Days1)
+
+chefmozhours4_mod1[,2:4] <- ifelse(chefmozhours4_mod1[,2:4] == "NA" , F , T) 
+
+names(chefmozhours4_mod1) <- c("placeID", "L-V", "S", "D")
+
+
+
 #Levantar datos de parking y guardar
 
 
 chefmozparking <- read.csv ("Dataset/chefmozparking.csv", sep = ',')
 chefmozparking$parking_lot [chefmozparking$parking_lot == "street"] <- "none"
 chefmozparking$parking_lot <- (ifelse(chefmozparking$parking_lot == "none", 0, 1))
+
+
+#Levantar datos de dias de atencion y guardar
+
+
+chefmozaccepts <- read.csv ("Dataset/chefmozaccepts.csv", sep = ',')
+chefmozaccepts$Rpayment <- toupper(chefmozaccepts$Rpayment)
+chefmozaccepts <- tidyr::spread(data = chefmozaccepts, key = Rpayment, value = Rpayment)
+print(colnames(chefmozaccepts))
+varstokeep <- c("placeID",  "AMERICAN_EXPRESS", "BANK_DEBIT_CARDS", "CASH", "MASTERCARD-EUROCARD", "VISA")
+chefmozaccepts <- chefmozaccepts[,varstokeep]
+chefmozaccepts[,2:6] <- ifelse(chefmozaccepts[,2:6] == "NA" , 0 , 1) 
 
 
