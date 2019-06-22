@@ -10,7 +10,79 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
+```{r Librerias}
+library(magrittr)
+library(plyr)
+library(dplyr)
+library(tidyverse)
+library(modelr)
+library(funModeling)
+library(ggplot2)
+library(ggcorrplot)
+library(MASS)
+library(GGally)
+library(simstudy)
+library(foreign)
+library(feather)
+library(data.table)
+library(jtools)
+library(purrr)
+library(tidyr)
+library(XML)
+library(xml2)
+library(jsonlite)
+library(rjson)
+library(stringi)
+library(here)
+library(PCAmixdata)
+library(psych)
+library(factoextra)
+```
+
+
+
+
 ```{r Carga de datos}
+geoplaces <- read.csv ("Dataset/geoplaces2.csv", sep = ',')
+geoplaces <- geoplaces[,1:3]
+plot(geoplaces[,2:3])
+```
+Analizando como se grafican las coordenadas podemos plantear que los restaurantes estan separado en 3 cuidades diferentes con punto de referencias aproximados:
+Puntos de Referencia
+22.156925, -100.985634 (San Luis Potosí)
+18.924490, -99.221556 (Morelos)
+23.732142, -99.148336 (Victoria.Tamaulipas)
+
+```{r Puntos Geo}
+library(sp)
+pointLat1 <- matrix(c(22.156925,-100.985634),ncol=2)
+pointLat2 <- matrix(c(18.924490,-99.221556),ncol=2)
+pointLat3 <- matrix(c(23.732142,-99.148336),ncol=2)
+pointRestaurant <- data.matrix(geoplaces[,2:3])
+distnaciasPointLat1 <- t(spDists(pointLat1, pointRestaurant, longlat = TRUE))
+distnaciasPointLat2 <- t(spDists(pointLat2, pointRestaurant, longlat = TRUE))
+distnaciasPointLat3 <- t(spDists(pointLat3, pointRestaurant, longlat = TRUE))
+distinacias <- data.frame(distnaciasPointLat1,distnaciasPointLat2,distnaciasPointLat3)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
 
 ```
 
