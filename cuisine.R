@@ -94,6 +94,7 @@ chefmozacceptsTipo <-chefmozacceptsTipo%>%
                       group_by(placeID)%>%
                       count(placeID)
 
+chefmozacceptsTipo2 <- tapply(chefmozacceptsTipo$placeID, chefmozacceptsTipo$placeID, count)
 
 
 #Levantar ratings y guardar
