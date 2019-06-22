@@ -42,30 +42,55 @@ library(factoextra)
 
 
 
-```{r Carga de datos}
+```{r Load: geoplaces2.csv }
 geoplaces <- read.csv ("Dataset/geoplaces2.csv", sep = ',')
-geoplaces <- geoplaces[,1:3]
-plot(geoplaces[,2:3])
+str(geoplaces)
 ```
-Analizando como se grafican las coordenadas podemos plantear que los restaurantes estan separado en 3 cuidades diferentes con punto de referencias aproximados:
-Puntos de Referencia
+
+Se plotean las coordenadas para identificar si estan visualmente separables
+```{r Plot coordenate}
+geoCoord <- geoplaces[,1:3]
+plot(geoCoord[,2:3])
+```
+
+Analizando como se gráfica las coordenadas podemos plantear que los restaurantes estan separado en 3 cuidades diferentes. Visualmente se identificicaron los punto de referencias aproximados y se contrastaron con su ubicación en el mapa para seleccionar los puntos:
+
+*Puntos de Referencia*
 22.156925, -100.985634 (San Luis Potosí)
 18.924490, -99.221556 (Morelos)
 23.732142, -99.148336 (Victoria.Tamaulipas)
 
-```{r Puntos Geo}
+```{r Distancia Geo}
 library(sp)
+#Creando los puntos de referencia
 pointLat1 <- matrix(c(22.156925,-100.985634),ncol=2)
 pointLat2 <- matrix(c(18.924490,-99.221556),ncol=2)
 pointLat3 <- matrix(c(23.732142,-99.148336),ncol=2)
-pointRestaurant <- data.matrix(geoplaces[,2:3])
+
+#Convertir a matrix las coordenadas
+pointRestaurant <- data.matrix(geoCoord[,2:3])
+
+#Calculando las distancias
 distnaciasPointLat1 <- t(spDists(pointLat1, pointRestaurant, longlat = TRUE))
 distnaciasPointLat2 <- t(spDists(pointLat2, pointRestaurant, longlat = TRUE))
 distnaciasPointLat3 <- t(spDists(pointLat3, pointRestaurant, longlat = TRUE))
-distinacias <- data.frame(distnaciasPointLat1,distnaciasPointLat2,distnaciasPointLat3)
 
+#Creando dataframe con todos los resultados
+distinacias <- data.frame(placeID=geoplaces$placeID,dist1=distnaciasPointLat1,dist2=distnaciasPointLat2,dist3 = distnaciasPointLat3)
+
+#Obtener el index del valor minimo que representa la ciudad y la distancia para ese valor
+for (i in seq(nrow(distinacias))) {
+  pCoord <- c(distinacias$dist1[i],distinacias$dist2[i],distinacias$dist3[i])
+  distinacias$ciudad[i] <- as.numeric(which.min(pCoord))
+  distinacias$minDist[i] <- distinacias[i,as.numeric(which.min(pCoord))+1]
+}
+head(distinacias)
 ```
 
+Se alizaron los valores de la columna 
+```{r ¿Fumadores?}
+
+```
 
 
 
