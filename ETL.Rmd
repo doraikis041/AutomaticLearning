@@ -5,54 +5,119 @@ date: "13 de junio de 2019"
 output: html_document
 ---
 
+*Planteo del problema*
+Rest-on es una guía turística que está armando en su web una sección de restoranes, que sirva para asesorar a sus clientes en las características y calidad de los restoranes. A estos efectos, los contratan a ustedes para apoyarlos en los algoritmos de soporte de su web, con dos objetivos: i. Poder recomendarles a sus clientes restoranes similares a los que han consultado ii. Rankear a los restoranes, en términos relativos a los restoranes comparables. A estos efectos, cuenta con una base de datos de restoranes, a la cual se puede acceder en el siguiente link:
+
+*Discuta el desafío planteado en términos de la importancia que tiene para una empresa cualquiera y para Rest-on en particular
+
+Dar buenas recomendaciones porque es su valor de negocio para otra industria no tiene porque serlo porque tienen otra de oferta de valor. Ejemplo:
+
+*Identifique conceptual y técnicamente qué tipo de modelos serían necesarios para atender este problema (no el algoritmo específico, sino el tipo de técnica). 
+
+*Plantee hipótesis respecto a qué dimensiones de análisis (a nivel conceptual y macro) y variables pueden ser relevantes para lograr el objetivo.
+
+Analizando el modelo de negocio de la empresa planteamos como hipótesis que:
+Para ofrecer mejores recomendaciones es necesario conocer las características de los restaurantes, entender que tipos de cliente asisten y establecer las peculiaridades de la comida.
+3.1	Dimensiones propuestas:
+•	Datos del cliente
+•	Características de los restaurantes
+•	Características de la comida
+
+Como variables dentro de cada dimensión identificamos las siguientes:
+•	Datos del cliente – deberíamos conocer el perfil y las costumbres de los clientes que concurren al restaurante, que nos permita clasificar los restaurantes partiendo de las características de los clientes que concurren y en qué modo lo hacen, ej, si es con familia, o amigos, si prefieren un ambiente más relajado, etc. 
+•	Características de la comida – esta dimensión abarca las particularidades de la comida respecto al tipo de menú, la forma en que se sirve, restricciones alimenticias, entre otros.
+•	Características de los restaurantes – aquí se recoge la tipología del restaurante, en relación a aspectos operativos y físicos, tales como  ubicación, disponibilidad de estacionamiento, medios de pagos aceptados, y otras cualidades que lo hagan atractivo.
+
+* Identifique, en base a lo anterior, qué tipo de datos precisaría obtener para llevar a cabo este trabajo
+
+<<Agregar la primer tabla>>
+
+5. Arme un plan de trabajo, identificando las diferentes etapas y actividades para lograr el objetivo. 
+Para el desarrollo de este trabajo se propone utilizar la metodología CRISP–DM.
+Dicha metodología abarca desde el entendimiento del negocio hasta el despliegue de la solución sin dejar de lado las tareas de gestión de proyectos que permiten el monitoreo de la evolución del proyecto controlando tiempos, costos y riesgos asociados. 
+
+6. ¿Cómo será utilizado el resultado del trabajo por el cliente? 
+El resultado o solución va a ser utilizado por la agencia turística para incluirlo en su motor de búsqueda y ofrecer un servicio que beneficie a sus usuarios, generando más volumen de visitas a su sitio y fidelizándolos.  
+Los restaurantes en la medida que este motor de búsqueda y recomendaciones tenga mayor difusión se beneficiaran por tener mayor publicidad y el perfil de clientes que se sienta más cómodo respecto  la propuesta que ofrece.
+El usuario en la medida que el motor de búsqueda sea reconocido y fiable en cuanto a las recomendaciones podrá disfrutar de opciones más adecuadas a sus preferencias.   
+
+7. En base a lo anterior, ¿Qué áreas se deberían involucrar en el proyecto y qué rol cumplirían?
+Tendría que participar el área comercial / marketing y el área de soporte técnico que son quienes más conocen a los usuarios de la guía, el área de operaciones/IT porque maneja la gestión de la empresa y va a tener que obtener la información de los diferentes restaurantes, finanzas para verificar los impactos económicos de las iniciativas y el equipo de Analistas de Datos para interactuar con los restantes interlocutores.
+
+* Extracción, Transformación o Carga de datos
+**Diseñe la estructura de tabla datos analítica: ¿qué va a ser cada fila? cuáles van a ser las columnas
+**¿Cómo se construye cada una de las variables en la tabla datos? De que table surge y que transformaciones de datos son necnesarias
+**Construya la tabla de datos analíticas en base a especificación anterior.
+
+<<Agregar la segunda tabla con perfilado de datos>>
+
+Se realiza el proceso de ETL de las fuentes de datos
+
 ```{r Inicio, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+set.seed(123)
 ```
 
-```{r Librerias}
-library(magrittr)
-library(plyr)
-library(dplyr)
-library(tidyverse)
-library(modelr)
-library(funModeling)
-library(ggplot2)
-library(ggcorrplot)
-library(MASS)
-library(GGally)
-library(simstudy)
-library(foreign)
-library(feather)
-library(data.table)
-library(jtools)
-library(purrr)
-library(tidyr)
-library(XML)
-library(xml2)
-library(jsonlite)
-library(rjson)
-library(stringi)
-library(here)
-library(PCAmixdata)
-library(psych)
-library(factoextra)
+Se cargan las librerías utilizadas para el proceso
+```{r Librerías, message=FALSE, warning=FALSE, paged.print=FALSE}
+# library(magrittr)
+# library(plyr)
+# library(dplyr)
+# library(tidyverse)
+# library(modelr)
+# library(funModeling)
+# library(ggplot2)
+# library(ggcorrplot)
+# library(MASS)
+# library(GGally)
+# library(simstudy)
+# library(foreign)
+# library(feather)
+# library(data.table)
+# library(jtools)
+# library(purrr)
+#library(tidyr)
+# library(XML)
+# library(xml2)
+# library(jsonlite)
+# library(rjson)
+# library(stringi)
+# library(here)
+# library(PCAmixdata)
+# library(psych)
+# library(factoextra)
+
+#Distancias Geograficas
+library(sp)
 ```
 
 
+```{r Tpo Comida :chefmozcuisine.csv}
+chefmozcuisine <- read.csv ("Dataset/chefmozcuisine.csv", sep = ',')
+str(chefmozcuisine)
+head(chefmozcuisine)
+```
+A crear una nueva variable a partir de la cantidad de opciones de comida que ofrencen los restaurantes registrados.
+```{r}
+chefmozcuisineCont <-chefmozcuisine%>%
+                      group_by(placeID)%>%
+                      count(placeID)
+head(chefmozcuisineCont)
+```
 
+***Transformación de datos de ubicación
 
-```{r Load: geoplaces2.csv }
+```{r Ubicación: geoplaces2.csv }
 geoplaces <- read.csv ("Dataset/geoplaces2.csv", sep = ',')
 str(geoplaces)
 ```
 
 Se plotean las coordenadas para identificar si estan visualmente separables
-```{r Plot coordenate}
+```{r Plot Coordenadas}
 geoCoord <- geoplaces[,1:3]
 plot(geoCoord[,2:3])
 ```
-
 Analizando como se gráfica las coordenadas podemos plantear que los restaurantes estan separado en 3 cuidades diferentes. Visualmente se identificicaron los punto de referencias aproximados y se contrastaron con su ubicación en el mapa para seleccionar los puntos:
 
 *Puntos de Referencia*
@@ -60,35 +125,36 @@ Analizando como se gráfica las coordenadas podemos plantear que los restaurante
 18.924490, -99.221556 (Morelos)
 23.732142, -99.148336 (Victoria.Tamaulipas)
 
-```{r Distancia Geo}
-library(sp)
+```{r Deter. Ciudades}
 #Creando los puntos de referencia
-pointLat1 <- matrix(c(22.156925,-100.985634),ncol=2)
-pointLat2 <- matrix(c(18.924490,-99.221556),ncol=2)
-pointLat3 <- matrix(c(23.732142,-99.148336),ncol=2)
+point1 <- matrix(c(22.156925,-100.985634),ncol=2)
+point2 <- matrix(c(18.924490,-99.221556),ncol=2)
+point3 <- matrix(c(23.732142,-99.148336),ncol=2)
 
 #Convertir a matrix las coordenadas
-pointRestaurant <- data.matrix(geoCoord[,2:3])
+mtxPoints <- data.matrix(geoCoord[,2:3])
 
 #Calculando las distancias
-distnaciasPointLat1 <- t(spDists(pointLat1, pointRestaurant, longlat = TRUE))
-distnaciasPointLat2 <- t(spDists(pointLat2, pointRestaurant, longlat = TRUE))
-distnaciasPointLat3 <- t(spDists(pointLat3, pointRestaurant, longlat = TRUE))
+distPoint1 <- t(spDists(point1, mtxPoints, longlat = TRUE))
+distPoint2 <- t(spDists(point2, mtxPoints, longlat = TRUE))
+distPoint3 <- t(spDists(point3, mtxPoints, longlat = TRUE))
 
 #Creando dataframe con todos los resultados
-distinacias <- data.frame(placeID=geoplaces$placeID,dist1=distnaciasPointLat1,dist2=distnaciasPointLat2,dist3 = distnaciasPointLat3)
+dfDistance <- data.frame(placeID=geoplaces$placeID,dist1=distPoint1,dist2=distPoint2,dist3 = distPoint3)
 
-#Obtener el index del valor minimo que representa la ciudad y la distancia para ese valor
-for (i in seq(nrow(distinacias))) {
-  pCoord <- c(distinacias$dist1[i],distinacias$dist2[i],distinacias$dist3[i])
-  distinacias$ciudad[i] <- as.numeric(which.min(pCoord))
-  distinacias$minDist[i] <- distinacias[i,as.numeric(which.min(pCoord))+1]
+#Obtener el index del valor mínimo que representa la ciudad y la distancia para ese valor
+for (i in seq(nrow(dfDistance))) {
+  pCoord <- c(dfDistance$dist1[i],dfDistance$dist2[i],dfDistance$dist3[i])
+  dfDistance$classCity[i] <- as.numeric(which.min(pCoord))
 }
-head(distinacias)
+
+dfDistance <- dfDistance[,c("placeID","classCity")]
+head(dfDistance)
 ```
 
-Se alizaron los valores de la columna 
+Se alizaron los valores del atributo smoking_area (none, not permitted,only at bar,permitted,section) se realizá un conversión a valores True para only_at_bar, permitted, section and False para los demas
 ```{r ¿Fumadores?}
+
 
 ```
 
