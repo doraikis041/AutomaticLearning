@@ -62,8 +62,8 @@ set.seed(123)
 Se cargan las librerías utilizadas para el proceso
 ```{r Librerías, message=FALSE, warning=FALSE, paged.print=FALSE}
 # library(magrittr)
-# library(plyr)
-# library(dplyr)
+library(plyr)
+library(dplyr)
 # library(tidyverse)
 # library(modelr)
 # library(funModeling)
@@ -99,10 +99,11 @@ str(chefmozcuisine)
 head(chefmozcuisine)
 ```
 A crear una nueva variable a partir de la cantidad de opciones de comida que ofrencen los restaurantes registrados.
-```{r}
+```{r CREATE Cantidad Comida}
 chefmozcuisineCont <-chefmozcuisine%>%
                       group_by(placeID)%>%
                       count(placeID)
+names(chefmozcuisineCont)[2] <- "foodCount"
 head(chefmozcuisineCont)
 ```
 
@@ -125,7 +126,7 @@ Analizando como se gráfica las coordenadas podemos plantear que los restaurante
 18.924490, -99.221556 (Morelos)
 23.732142, -99.148336 (Victoria.Tamaulipas)
 
-```{r Deter. Ciudades}
+```{r Distancias Ciudades}
 #Creando los puntos de referencia
 point1 <- matrix(c(22.156925,-100.985634),ncol=2)
 point2 <- matrix(c(18.924490,-99.221556),ncol=2)
@@ -153,11 +154,32 @@ head(dfDistance)
 ```
 
 Se alizaron los valores del atributo smoking_area (none, not permitted,only at bar,permitted,section) se realizá un conversión a valores True para only_at_bar, permitted, section and False para los demas
-```{r ¿Fumadores?}
+```{r ¿Fumadores? isSmoking}
+smokingPlace <- geoplaces[,c("placeID","smoking_area")]
+smokingPlace$smoking_area <- tolower(smokingPlace$smoking_area)
 
-
+for (i in seq(nrow(smokingPlace))) {
+  smokingPlace$isSmoking[i] <- if(smokingPlace$smoking_area[i] == "only at bar" 
+                           || smokingPlace$smoking_area[i] == "permitted"
+                           || smokingPlace$smoking_area[i] == "section") T else F
+}
+head(smokingPlace,10)
 ```
 
+Despues de analizado los datos se identifica que los restaurantes tienen varias opciones de medios de pagos por tanto se considera relevante para el analisis la cantidad de variables que tiene cada restaurante.
+
+```{r Cantidad Medio Pgo}
+#Carga de datos
+chefmozaccepts <- read.csv ("Dataset/chefmozaccepts.csv", sep = ',')
+# Se calcula la cantidad medios de pagos por cada restaurante
+chefmozacceptsTipo <-chefmozacceptsTipo%>%
+                      group_by(placeID)%>%
+                      count(placeID)
+
+names(chefmozacceptsTipo)[2] <- "mpgoCount"
+head(chefmozacceptsTipo,10)
+
+```
 
 
 

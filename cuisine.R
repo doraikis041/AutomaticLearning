@@ -59,8 +59,8 @@ head(chefmozcuisine_clasificado)
 
 #Levantar datos de dias de atencion y guardar
 # 
-# chefmozhours4_mod <- read.csv ("Dataset/chefmozhours4_modificado.csv", sep = ';')
-# chefmozhours4_mod$Days1 <- ifelse(chefmozhours4_mod$Days1 == "Mon", 1, (chefmozhours4_mod$Days1))
+chefmozhours4_mod <- read.csv ("Dataset/chefmozhours4_modificado.csv", sep = ';')
+chefmozhours4_mod$Days1 <- ifelse(chefmozhours4_mod$Days1 == "Mon", 1, (chefmozhours4_mod$Days1))
 
 # se eliminan las columnas con los restantes dias de la semana (tue-fri) y las filas repetidas
 
@@ -93,7 +93,7 @@ chefmozacceptsTipo <-chefmozacceptsTipo%>%
                       group_by(placeID)%>%
                       count(placeID)
 
-chefmozacceptsTipo2 <- tapply(chefmozacceptsTipo$placeID, chefmozacceptsTipo$placeID, count)
+#hefmozacceptsTipo2 <- tapply(chefmozacceptsTipo$placeID, chefmozacceptsTipo$placeID, count)
 
 
 #Levantar ratings y guardar
