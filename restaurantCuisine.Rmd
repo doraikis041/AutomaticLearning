@@ -1,0 +1,407 @@
+---
+title: "ETL"
+author: "Leticia Suarez (202006) - Doris Medina (241578)"
+date: "13 de junio de 2019"
+output: html_document
+---
+
+*Planteo del problema*
+Rest-on es una guía turística que está armando en su web una sección de restoranes, que sirva para asesorar a sus clientes en las características y calidad de los restoranes. A estos efectos, los contratan a ustedes para apoyarlos en los algoritmos de soporte de su web, con dos objetivos: 
+i.	Poder recomendarles a sus clientes restoranes similares a los que han consultado
+ii.	Rankear a los restoranes, en términos relativos a los restoranes comparables. 
+A estos efectos, cuenta con una base de datos de restoranes, a la cual se puede acceder en el siguiente link: https://archive.ics.uci.edu/ml/datasets/Restaurant+%26+consumer+data
+
+*2	*Entendimiento del caso de negocio y planificación del trabajo
+*Discuta el desafío planteado en términos de la importancia que tiene para una empresa cualquiera y para Rest-on en particular
+
+Dar buenas recomendaciones porque es su valor de negocio para otra industria no tiene porque serlo porque tienen otra de oferta de valor. Ejemplo:
+
+*Identifique conceptual y técnicamente qué tipo de modelos serían necesarios para atender este problema (no el algoritmo específico, sino el tipo de técnica). 
+
+*Plantee hipótesis respecto a qué dimensiones de análisis (a nivel conceptual y macro) y variables pueden ser relevantes para lograr el objetivo.
+
+Analizando el modelo de negocio de la empresa planteamos como hipótesis que:
+Para ofrecer mejores recomendaciones es necesario conocer las características de los restaurantes, entender que tipos de cliente asisten y establecer las peculiaridades de la comida.
+3.1	Dimensiones propuestas:
+•	Datos del cliente
+•	Características de los restaurantes
+•	Características de la comida
+
+Como variables dentro de cada dimensión identificamos las siguientes:
+•	Datos del cliente – deberíamos conocer el perfil y las costumbres de los clientes que concurren al restaurante, que nos permita clasificar los restaurantes partiendo de las características de los clientes que concurren y en qué modo lo hacen, ej, si es con familia, o amigos, si prefieren un ambiente más relajado, etc. 
+•	Características de la comida – esta dimensión abarca las particularidades de la comida respecto al tipo de menú, la forma en que se sirve, restricciones alimenticias, entre otros.
+•	Características de los restaurantes – aquí se recoge la tipología del restaurante, en relación a aspectos operativos y físicos, tales como  ubicación, disponibilidad de estacionamiento, medios de pagos aceptados, y otras cualidades que lo hagan atractivo.
+
+* Identifique, en base a lo anterior, qué tipo de datos precisaría obtener para llevar a cabo este trabajo
+
+<<Agregar la primer tabla>>
+
+5. Arme un plan de trabajo, identificando las diferentes etapas y actividades para lograr el objetivo. 
+Para el desarrollo de este trabajo se propone utilizar la metodología CRISP–DM.
+Dicha metodología abarca desde el entendimiento del negocio hasta el despliegue de la solución sin dejar de lado las tareas de gestión de proyectos que permiten el monitoreo de la evolución del proyecto controlando tiempos, costos y riesgos asociados. 
+
+6. ¿Cómo será utilizado el resultado del trabajo por el cliente? 
+El resultado o solución va a ser utilizado por la agencia turística para incluirlo en su motor de búsqueda y ofrecer un servicio que beneficie a sus usuarios, generando más volumen de visitas a su sitio y fidelizándolos.  
+Los restaurantes en la medida que este motor de búsqueda y recomendaciones tenga mayor difusión se beneficiaran por tener mayor publicidad y el perfil de clientes que se sienta más cómodo respecto  la propuesta que ofrece.
+El usuario en la medida que el motor de búsqueda sea reconocido y fiable en cuanto a las recomendaciones podrá disfrutar de opciones más adecuadas a sus preferencias.   
+
+7. En base a lo anterior, ¿Qué áreas se deberían involucrar en el proyecto y qué rol cumplirían?
+Tendría que participar el área comercial / marketing y el área de soporte técnico que son quienes más conocen a los usuarios de la guía, el área de operaciones/IT porque maneja la gestión de la empresa y va a tener que obtener la información de los diferentes restaurantes, finanzas para verificar los impactos económicos de las iniciativas y el equipo de Analistas de Datos para interactuar con los restantes interlocutores.
+
+* Extracción, Transformación o Carga de datos
+**Diseñe la estructura de tabla datos analítica: ¿qué va a ser cada fila? cuáles van a ser las columnas
+**¿Cómo se construye cada una de las variables en la tabla datos? De que table surge y que transformaciones de datos son necnesarias
+**Construya la tabla de datos analíticas en base a especificación anterior.
+
+<<Agregar la segunda tabla con perfilado de datos>>
+
+Se realiza el proceso de ETL de las fuentes de datos
+
+```{r Inicio, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+set.seed(123)
+```
+
+Se cargan las librerías utilizadas para el proceso
+```{r Librerías, message=FALSE, warning=FALSE, paged.print=FALSE}
+# library(magrittr)
+library(plyr)
+library(dplyr)
+library(Hmisc)
+# library(tidyverse)
+# library(modelr)
+# library(funModeling)
+# library(ggplot2)
+library(ggcorrplot)
+# library(MASS)
+# library(GGally)
+# library(simstudy)
+# library(foreign)
+# library(feather)
+# library(data.table)
+# library(jtools)
+# library(purrr)
+library(tidyr)
+# library(XML)
+# library(xml2)
+# library(jsonlite)
+# library(rjson)
+# library(stringi)
+# library(here)
+# library(PCAmixdata)
+ library(psych)
+# library(factoextra)
+
+#Distancias Geograficas
+library(sp)
+```
+
+El dataset original tiene 59 niveles de tipos de comida. Para trabajar con menos niveles y obtener mejores resultados a la hora de realizar el cluster se realzó una revisión general y se estableció una lista resudic
+
+```{r Tpo Comida: Grupo de Comida}
+# ## REVISAR NO GENERA UN VALOR UNICO PARA CADA RESTAURANTE ...
+# 
+# chefmozcuisine_tabla_clasificacion <- read.csv ("Dataset/Cuisine_agrupado.csv", sep = ';')
+# 
+# # a continuacion se unen ambas tablas conservando todas las filas del dataset original y agregando 
+# # la columna con la nueva clasificacion.
+# chefmozcuisine_clasificado <- left_join( chefmozcuisine_original, chefmozcuisine_tabla_clasificacion, by="Rcuisine")
+# 
+# # adicionalmente se elimina la columna con la clasificacion anterior y todas las filas que quedaron 
+# # con igual clasificacion para el mismo ID
+# chefmozcuisine_clasificado <- unique(chefmozcuisine_clasificado[,-2])
+# 
+# # algunos placeID tienen mas de una propuesta. Considerando que ya se hizo el trabajo anterior de
+# # reagrupar los similares se decide dejar los que luego de esta modificacion mantienen mas de una propuesta
+# str(chefmozcuisine_clasificado)
+# head(chefmozcuisine_clasificado,10)
+
+```
+
+***Transformación de datos de ubicación
+Para analizar las distancias gegraficas de los restaurantes se analiza la fuente de datos geoplaces2.csv que tiene un 21 variables para analizar. A continuación se muestran las carateristicas de las vaiables, tipos de datos y framento de valores a partir de la función *srt*
+
+```{r Ubicación: geoplaces2.csv }
+geoplaces <- read.csv ("Dataset/geoplaces2.csv", sep = ',')
+str(geoplaces)
+```
+
+Las primeras variables dentro de este set de datos que será analizadas son latitud(latitude) y longitud(longitude). A continuación se grafican los puntos para reivisar si distribución. 
+```{r Plot Coordenadas}
+geoCoord <- geoplaces[,1:3]
+plot(geoCoord[,2:3])
+```
+Analizando como se gráfica las coordenadas podemos plantear que los restaurantes estan separado en 3 cuidades diferentes. Visualmente se identificicaron los punto de referencias aproximados y se contrastaron con su ubicación en el mapa para seleccionar los puntos. Se debe definir las distancias entre los restaurantes y 3 puntos de referencia para establecer un marco comparativo entre las posiciones de los resutantes y los puntos de referencia.Los puntos de referencia elejidos arbitrariamente fueron:
+22.156925, -100.985634 (San Luis Potosí)
+18.924490, -99.221556 (Morelos)
+23.732142, -99.148336 (Victoria.Tamaulipas)
+
+```{r Distancias Ciudades}
+#Creando los puntos de referencia
+point1 <- matrix(c(22.156925,-100.985634),ncol=2)
+point2 <- matrix(c(18.924490,-99.221556),ncol=2)
+point3 <- matrix(c(23.732142,-99.148336),ncol=2)
+
+#Convertir a matrix las coordenadas
+mtxPoints <- data.matrix(geoCoord[,2:3])
+
+#Calculando las distancias
+distPoint1 <- t(spDists(point1, mtxPoints, longlat = TRUE))
+distPoint2 <- t(spDists(point2, mtxPoints, longlat = TRUE))
+distPoint3 <- t(spDists(point3, mtxPoints, longlat = TRUE))
+
+#Creando dataframe con todos los resultados
+dfDistance <- data.frame(placeID=geoplaces$placeID,distPoint1=distPoint1,distPoint2=distPoint2,distPoint3 = distPoint3)
+
+#Obtener el index del valor mínimo que representa la ciudad permitiendo agruparlas
+for (i in seq(nrow(dfDistance))) {
+  pCoord <- c(dfDistance$distPoint1[i],dfDistance$distPoint2[i],dfDistance$distPoint3[i])
+  dfDistance$classCity[i] <- as.numeric(which.min(pCoord))
+}
+head(dfDistance)
+```
+
+Entre los datos identificados en la fuente de datos geoplaces2.csv se encuentra la variable smoking_area la cul fue analizada e identificamos que los siguientes valores unicos (none, not permitted,only at bar,permitted,section). Vamos a transforma esta variable en logica para establecer si el restaurantes permite o no fumar vajo ciertas condiciones. Se realizá un conversión a valores True para only_at_bar, permitted, section and False para los demas
+```{r ¿Fumadores? isSmoking}
+# Se carga la variables a analizar.
+smokingPlace <- geoplaces[,c("placeID","smoking_area")]
+levels(smokingPlace$smoking_area)
+smokingPlace$smoking_area <- tolower(smokingPlace$smoking_area)
+
+#Se identifica si el restaurante entra o no en la clasificación de fumadores.
+for (i in seq(nrow(smokingPlace))) {
+  smokingPlace$isSmoking[i] <- if(smokingPlace$smoking_area[i] == "only at bar"
+                           || smokingPlace$smoking_area[i] == "permitted"
+                           || smokingPlace$smoking_area[i] == "section") T else F
+}
+
+# Se muestran los primero 10 registros
+head(smokingPlace,10)
+```
+
+*Analisis de los tipos de comida
+La primera variable a revisar es Rcuisine de la base chefmozcuisine.csv donde se identifica 59 tipos de comidas distribuida entre todos los restaurantes. Un restaurante tiene varios tipos de comida que ofrece. A continuación se muestra el resumen de los datos cargados y un ejemplo de 6 valores. 
+```{r Tpo Comida: chefmozcuisine.csv}
+chefmozcuisine <- read.csv ("Dataset/chefmozcuisine.csv", sep = ',')
+str(chefmozcuisine)
+head(chefmozcuisine)
+```
+A partir de analisis anterior consideramos que aporta información de negocio determinar la cantidad de tipos de comida que ofrecen los restaurantes partiendo de la base que a mayor cantidad de ofertas permite un publico mas variado
+```{r CREATE Tpo Comida: Cantidad Comida}
+chefmozcuisineCont <-chefmozcuisine%>%
+                      group_by(placeID)%>%
+                      count(placeID)
+
+names(chefmozcuisineCont)[2] <- "foodCount"
+head(chefmozcuisineCont)
+```
+
+Se analizan los días de atención de los reststaurantes. 
+
+```{r Dias Atencion}
+# chefmozhours4_mod <- read.csv ("Dataset/chefmozhours4_modificado.csv", sep = ',')
+# str(chefmozhours4_mod)
+# #Levantar datos de dias de atencion y guardar
+# # 
+# 
+# chefmozhours4_mod$Days1 <- ifelse(chefmozhours4_mod$Days1 == "Mon", 1, (chefmozhours4_mod$Days1))
+# 
+# # se eliminan las columnas con los restantes dias de la semana (tue-fri) y las filas repetidas
+# 
+# chefmozhours4_mod <- unique(chefmozhours4_mod[,-3:-6])
+# chefmozhours4_mod1 <- tidyr::spread(data = chefmozhours4_mod, key = Days1, value = Days1)
+# chefmozhours4_mod1[,2:4] <- ifelse(chefmozhours4_mod1[,2:4] == "NA" , F , T)
+# names(chefmozhours4_mod1) <- c("placeID", "L-V", "S", "D")
+```
+
+Otras de las variable a analizar es si tiene parking o no el restaurante. Cuando se carga los datos se identificaron 7 factores donde se distribuyen los datos. En ese caso se consideró crear una nueva variable logica donde se guarde TRUE cuando sean los valores(fee,public,valet parking,validated parking,yes) y FALSE cuando sea igual none o stree.
+```{r ¿Tiene Parking?}
+#Levantar datos de parking y guardar
+chefmozparking <- read.csv ("Dataset/chefmozparking.csv", sep = ',')
+
+#Se identificaron los valores para el factor parking_lot
+levels(chefmozparking$parking_lot)
+
+#Cuando sea stree se convierte a none porque se considera que no se clasifica como que tiene parqueo.
+chefmozparking$parking_lot[chefmozparking$parking_lot == "street"] <- "none"
+
+#Se crea una nueva variable parking_lot
+chefmozparking$hasParking <- (ifelse(chefmozparking$parking_lot == "none", F, T))
+chefmozparking$parking_lot <- NULL
+head(chefmozparking)
+str(chefmozparking)
+```
+
+Se analizaron los medios de pagos en la base de clientes "userpayment.csv" para identficar los mas usados y así cargar los mas identificativos del negocio. Se generó una columna para cada medio de pago y se determino por restaurante TRUE O FALSE si tenia disponible este medio de pago.
+
+```{r Medios Pagos: Tipos}
+#Levantar datos de medios de pago aceptados y guardar
+chefmozaccepts <- read.csv ("Dataset/chefmozaccepts.csv", sep = ',')
+
+#Llevar todo a mayúscula y luego nos quedamos con los registros unicos
+chefmozaccepts$Rpayment <- toupper(chefmozaccepts$Rpayment)
+chefmozaccepts <- unique(chefmozaccepts)
+
+#Genero el mismo set de datos para genera posteriormente
+chefmozacceptsCant <- chefmozaccepts
+
+# Se normaliza todos los valores de medio de pago
+chefmozaccepts <- tidyr::spread(data = chefmozaccepts, key = Rpayment, value = Rpayment)
+print(colnames(chefmozaccepts))
+
+#Seleccionamos las columnas que mantendremos
+varsToKeep <- c("placeID",  "AMERICAN_EXPRESS", "BANK_DEBIT_CARDS", "CASH", "MASTERCARD-EUROCARD", "VISA")
+chefmozaccepts <- chefmozaccepts[,varsToKeep]
+chefmozaccepts[,2:6] <- ifelse(is.na(chefmozaccepts[,2:6]) == T , T , F)
+head(chefmozaccepts, 10)
+```
+Despues de analizado los datos se identifica que los restaurantes tienen varias opciones de medios de pagos por tanto se considera relevante para el analisis la cantidad de opciones que tiene cada restaurante.
+Se consideró como una nueva variable la cantidad de medios de pagos que tiene cada restaurante.
+```{r Medios Pagos: Cantidad}
+
+# Se calcula la cantidad medios de pagos por cada restaurante
+chefmozacceptsCant <-chefmozacceptsCant%>%
+                      group_by(placeID)%>%
+                      count(placeID)
+
+names(chefmozacceptsCant)[2] <- "payCount"
+head(chefmozacceptsCant,10)
+```
+
+Ratings: Se cargaron las variables relacionadas a los rating de los restaurantes, comida y servicio.
+```{r}
+#Levantar ratings y guardar
+ratings <- read.csv ("Dataset/rating_final.csv", sep = ',')
+str(ratings)
+
+#Se elimina la colmna de usuario
+ratings <- ratings[,-1]
+
+#Se calcula el promedio del rating realizado por todos los usuarios.
+ratings <- aggregate(ratings[,2:4], list(ratings$placeID), mean)
+names(ratings) <- c("placeID", "rating", "foodRating", "serviceRating")
+
+head(ratings)
+```
+
+```{r Otros atributos geoplaces}
+otherAttributes <- geoplaces[,c("placeID","area","franchise","Rambience","price","accessibility","dress_code","alcohol")]
+str(otherAttributes)
+
+#Se convierte a logica la variable "franchise" 
+otherAttributes$franchise <- ifelse(toupper(otherAttributes$franchise) == "T",T,F)
+head(otherAttributes,10)
+print(levels(otherAttributes$alcohol))
+```
+
+Uniones entre las set de datos para generar la tabla principal de datos:
+```{r Union entre dataset}
+
+#uniendo Distancias geograficas con 
+allRestaurant <- left_join(x = dfDistance
+                       ,y = smokingPlace
+                       ,by = "placeID",
+                       all = TRUE)
+
+allRestaurant <- left_join(x = allRestaurant
+                       ,y = chefmozcuisineCont
+                       ,by = "placeID",
+                       all = TRUE)
+
+allRestaurant <- left_join(x = allRestaurant
+                       ,y = chefmozparking
+                       ,by = "placeID",
+                       all = TRUE)
+
+allRestaurant <- left_join(x = allRestaurant
+                       ,y = chefmozaccepts
+                       ,by = "placeID",
+                       all = TRUE)
+
+allRestaurant <- left_join(x = allRestaurant
+                       ,y = chefmozacceptsCant
+                       ,by = "placeID",
+                       all = TRUE)
+
+allRestaurant <- left_join(x = allRestaurant
+                       ,y = ratings
+                       ,by = "placeID",
+                       all = TRUE)
+
+allRestaurant <- left_join(x = allRestaurant
+                       ,y = otherAttributes
+                       ,by = "placeID",
+                       all = TRUE)
+
+head(allRestaurant)
+```
+Analisis de datos faltantes y NAs
+```{r Valores Faltantes}
+
+```
+
+
+```{r Matriz Correlacion}
+# calculamos la matriz de correlacion 
+matriz <- allRestaurant  %>%
+  na.omit() %>%
+  select_if(is.numeric)%>%
+  as.matrix() %>%
+  rcorr
+
+# graficamosla matriz de correlacion
+is.na(allRestaurant) <- sapply(allRestaurant, is.infinite)
+allRestaurant[is.na(allRestaurant)] <- 0
+
+ allRestaurant %>%
+   na.omit() %>%
+   select_if(is.numeric) %>%
+   cor %>%
+   ggcorrplot(type = "lower", ggtheme = theme_minimal, colors = c("#6D9EC1","white","#E46726"),
+              show.diag = T,
+              lab = T, lab_size = 3,
+              title = "Correlation Matrix",
+              legend.title = "Correlation Value",
+              outline.color = "white",
+              hc.order = T)
+```
+
+```{r}
+#Identificando outliers
+pairs.panels(allRestaurant[,2:5], stars = TRUE)
+```
+
+```{r Gower}
+# ### Modelos de clustering con datos categóricos
+# ### opciones
+# 
+# # 1) Distancia de Gower
+# # 2) Función kmodes (paquete KlaR)
+# # 3) Paquete Kamila (muy nuevo)
+# 
+# ### Opción 1 distancia de gower
+# library(cluster)
+# # 1 construir matriz de disimilaridad
+# setwd("C:/Users/usuario/Documents/ort")
+# vinos <- read.csv2('winequality-red.csv')
+# gower.dist <- daisy(vinos, metric = c("gower")) # otras opciones son euclidean, manhattan
+# class(gower.dist)
+# 
+# # 2 modelar
+# 
+# # clustering divisivo
+# divisive.clust <- diana(as.matrix(gower.dist), 
+#                         diss = TRUE, keep.diss = TRUE)
+# plot(divisive.clust, main = "Divisive")
+# 
+# # clustering aglomerativo
+# aggl.clust.c <- hclust(gower.dist, method = "complete")
+# plot(aggl.clust.c,
+#      main = "Agglomerative, complete linkages")
+# 
+# # 3 evaluar
+# # método del codo
+# # método de la silueta
+```
+
