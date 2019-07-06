@@ -38,7 +38,10 @@ Como variables dentro de cada dimensión identificamos las siguientes:
 
 5. Arme un plan de trabajo, identificando las diferentes etapas y actividades para lograr el objetivo. 
 Para el desarrollo de este trabajo se propone utilizar la metodología CRISP–DM.
-Dicha metodología abarca desde el entendimiento del negocio hasta el despliegue de la solución sin dejar de lado las tareas de gestión de proyectos que permiten el monitoreo de la evolución del proyecto controlando tiempos, costos y riesgos asociados. 
+Dicha metodología abarca desde el entendimiento del negocio hasta el despliegue de la solución sin dejar de lado las tareas de gestión de proyectos que permiten el monitoreo de la evolución del proyecto controlando tiempos, costos y riesgos asociados.
+
+  Gestion de proyecto:
+  Para la implementacion del proyecto se realizara entre el equipo un control de toda la version del proyecto y se genera un repositorio para el segimiento y control de codigo. Utilizando buenas practias reduce la posible generacion de errores en los controloes de cambio.
 
 6. ¿Cómo será utilizado el resultado del trabajo por el cliente? 
 El resultado o solución va a ser utilizado por la agencia turística para incluirlo en su motor de búsqueda y ofrecer un servicio que beneficie a sus usuarios, generando más volumen de visitas a su sitio y fidelizándolos.  
@@ -69,6 +72,7 @@ Se cargan las librerías utilizadas para el proceso
 library(plyr)
 library(dplyr)
 library(Hmisc)
+library(cluster)
 # library(tidyverse)
 # library(modelr)
 # library(funModeling)
@@ -336,11 +340,14 @@ allRestaurant <- left_join(x = allRestaurant
 
 head(allRestaurant)
 ```
-Analisis de datos faltantes y NAs
+Analisis de datos faltantes y NAs y modificación de tipos de datos
 ```{r Valores Faltantes}
+dfAllRestaurant <- na.omit(allRestaurant)
+dfAllRestaurant$smoking_area <- as.factor(dfAllRestaurant$smoking_area) 
+dfAllRestaurant$isSmoking <- as.logical(dfAllRestaurant$isSmoking) 
 
+str(dfAllRestaurant)
 ```
-
 
 ```{r Matriz Correlacion}
 # calculamos la matriz de correlacion 
@@ -367,41 +374,136 @@ allRestaurant[is.na(allRestaurant)] <- 0
               hc.order = T)
 ```
 
+
 ```{r}
-#Identificando outliers
-pairs.panels(allRestaurant[,2:5], stars = TRUE)
+#Identificando outliers (Variables númericas)
+varNun <- which(sapply(allRestaurant,is.numeric))
+allRestNum <- allRestaurant[,varNun]
+
+pairs.panels(allRestNum, stars = TRUE)
+
 ```
 
-```{r Gower}
-# ### Modelos de clustering con datos categóricos
-# ### opciones
+PCA
+```{r}
+# Si tengo tiempo lo agrego
+# Ejemplo Análisis de componentes principales para variables mixtas (numéricas y categóricas)
+
+## Librería
+# library(PCAmixdata)
 # 
-# # 1) Distancia de Gower
-# # 2) Función kmodes (paquete KlaR)
-# # 3) Paquete Kamila (muy nuevo)
+# ## Datos de ejemplo
+# data("gironde")
 # 
-# ### Opción 1 distancia de gower
-# library(cluster)
-# # 1 construir matriz de disimilaridad
-# setwd("C:/Users/usuario/Documents/ort")
-# vinos <- read.csv2('winequality-red.csv')
-# gower.dist <- daisy(vinos, metric = c("gower")) # otras opciones son euclidean, manhattan
-# class(gower.dist)
+# ## Estructura de la tabla
+# str(gironde) # sóllo hay variables numércias y factores
 # 
-# # 2 modelar
+# ## separamos numéricas de factores
+# separacion <- splitmix(gironde)
 # 
-# # clustering divisivo
-# divisive.clust <- diana(as.matrix(gower.dist), 
-#                         diss = TRUE, keep.diss = TRUE)
-# plot(divisive.clust, main = "Divisive")
+# cuantitativas <- separacion$X.quanti
 # 
-# # clustering aglomerativo
-# aggl.clust.c <- hclust(gower.dist, method = "complete")
-# plot(aggl.clust.c,
-#      main = "Agglomerative, complete linkages")
+# cualitativas <- separacion$X.quali
 # 
+# ## PCAmix
+# 
+# mixpca <- PCAmix(cuantitativas, cualitativas, rename.level = TRUE, graph = FALSE, ndim = 34)
+# 
+# 
+# # contribución a la varianza
+# 
+# mixpca$eig # ek 90.21732% de la varianza se acumula en el componente 20
+# 
+# ## scores componentes principales
+# 
+# b <- mixpca$scores
+# head(b)
+# 
+# c <- mixpca$scores.stand
+# head(c)
+
+```
+
+
+```{r Distancia de Gower}
+dfGowerDist <- daisy(dfAllRestaurant, metric = c("gower"))
+class(dfGowerDist)
+hist(dfGowerDist, xlim = range(0.0,1.0))
+```
+
+
+```{r Clustering divisivo}
+divisive.clust <- diana(as.matrix(dfGowerDist), 
+                        diss = TRUE, keep.diss = TRUE)
+plot(divisive.clust, main = "Divisive")
+```
+
+```{r Metodo Aglomerativo}
+aggl.clust.c <- hclust(dfGowerDist, method = "complete")
+
+plot(aggl.clust.c,
+     main = "Agglomerative, complete linkages")
+```
+
+
+
+
+
+```{r Evaluación}
+
+
+
+
 # # 3 evaluar
 # # método del codo
+# Elbow
+stats.df.divisive <- cstats.table(gower.dist, divisive.clust, 7)
+
+ggplot(data = data.frame(t(cstats.table(dfGowerDist, tree, 17))), 
+  aes(x=cluster.number, y=within.cluster.ss)) + 
+  geom_point()+
+  geom_line()+
+  ggtitle("Divisive clustering") +
+  labs(x = "Num.of clusters", y = "Within clusters sum of squares (SS)") +
+  theme(plot.title = element_text(hjust = 0.5))
 # # método de la silueta
+```
+
+```{r}
+# 3) Evaluar
+# Número óptimo de clusters: método del codo
+# Validación interna: método de la silueta
+
+
+stats.df.divisive <- cstats.table(gower.dist, divisive.clust, 7)
+
+# Elbow
+# Divisive clustering
+library(ggplot2)
+ggplot(data = data.frame(t(cstats.table(gower.dist, divisive.clust, 15))), 
+       aes(x=cluster.number, y=within.cluster.ss)) + 
+  geom_point()+
+  geom_line()+
+  ggtitle("Divisive clustering") +
+  labs(x = "Num.of clusters", y = "Within clusters sum of squares (SS)") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# Agglomerative clustering
+ggplot(data = data.frame(t(cstats.table(gower.dist, aggl.clust.c, 15))), 
+       aes(x=cluster.number, y=within.cluster.ss)) + 
+  geom_point()+
+  geom_line()+
+  ggtitle("Agglomerative clustering") +
+  labs(x = "Num.of clusters", y = "Within clusters sum of squares (SS)") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# silhouette
+ggplot(data = data.frame(t(cstats.table(gower.dist, divisive.clust, 15))), 
+       aes(x=cluster.number, y=avg.silwidth)) + 
+  geom_point()+
+  geom_line()+
+  ggtitle("Divisive clustering") +
+  labs(x = "Num.of clusters", y = "Average silhouette width") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
