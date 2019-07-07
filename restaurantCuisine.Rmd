@@ -4,8 +4,8 @@ author: "Leticia Suarez (202006) - Doris Medina (241578)"
 date: "13 de junio de 2019"
 output: html_document
 ---
-
-*Planteo del problema*
+# 1. - Entendimiento del caso de negocio y planificación del trabajo
+## 1.1 - Planteo del problema
 Rest-on es una guía turística que está armando en su web una sección de restoranes, que sirva para asesorar a sus clientes en las características y calidad de los restoranes. A estos efectos, los contratan a ustedes para apoyarlos en los algoritmos de soporte de su web, con dos objetivos: 
 i.	Poder recomendarles a sus clientes restoranes similares a los que han consultado
 ii.	Rankear a los restoranes, en términos relativos a los restoranes comparables. 
@@ -51,7 +51,7 @@ El usuario en la medida que el motor de búsqueda sea reconocido y fiable en cua
 7. En base a lo anterior, ¿Qué áreas se deberían involucrar en el proyecto y qué rol cumplirían?
 Tendría que participar el área comercial / marketing y el área de soporte técnico que son quienes más conocen a los usuarios de la guía, el área de operaciones/IT porque maneja la gestión de la empresa y va a tener que obtener la información de los diferentes restaurantes, finanzas para verificar los impactos económicos de las iniciativas y el equipo de Analistas de Datos para interactuar con los restantes interlocutores.
 
-* Extracción, Transformación o Carga de datos
+# 2. Extracción, Transformación o Carga de datos
 **Diseñe la estructura de tabla datos analítica: ¿qué va a ser cada fila? cuáles van a ser las columnas
 **¿Cómo se construye cada una de las variables en la tabla datos? De que table surge y que transformaciones de datos son necnesarias
 **Construya la tabla de datos analíticas en base a especificación anterior.
@@ -60,22 +60,19 @@ Tendría que participar el área comercial / marketing y el área de soporte té
 
 Se realiza el proceso de ETL de las fuentes de datos
 
-```{r Inicio, include=FALSE}
+## 2.1 Preparación del entrono de trabajo
+```{r Inicio, message=FALSE, warning=FALSE, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
-set.seed(123)
-```
 
-Se cargan las librerías utilizadas para el proceso
-```{r Librerías, message=FALSE, warning=FALSE, paged.print=FALSE}
-# library(magrittr)
+#Se cargan las librerías utilizadas para el proceso
 library(plyr) # OK
 library(dplyr) # OK
 library(Hmisc) # OK
 library(cluster) # OK
 library(tidyverse)
 library(modelr)
-library(funModeling)
+library(funModeling) #OK
 library(ggplot2)
 library(ggcorrplot) # OK
 library(MASS)
@@ -93,52 +90,36 @@ library(jsonlite)
 library(rjson)
 library(stringi)
 library(here)
-library(PCAmixdata)
- 
+library(PCAmixdata) #OK
 library(psych) # OK
 library(factoextra)
 library(fpc) #OK
 #Distancias Geograficas
 library(sp)
+# library(magrittr)
+
+#Se carga funciones utilizadas
 source("Utility/tablaresumen.R")
+
+#Se establece la semilla utilizada en proyecto
+set.seed(123)
 ```
 
-El dataset original tiene 59 niveles de tipos de comida. Para trabajar con menos niveles y obtener mejores resultados a la hora de realizar el cluster se realzó una revisión general y se estableció una lista resudic
 
-```{r Tpo Comida: Grupo de Comida}
-# ## REVISAR NO GENERA UN VALOR UNICO PARA CADA RESTAURANTE ...
-# 
-# chefmozcuisine_tabla_clasificacion <- read.csv ("Dataset/Cuisine_agrupado.csv", sep = ';')
-# 
-# # a continuacion se unen ambas tablas conservando todas las filas del dataset original y agregando 
-# # la columna con la nueva clasificacion.
-# chefmozcuisine_clasificado <- left_join( chefmozcuisine_original, chefmozcuisine_tabla_clasificacion, by="Rcuisine")
-# 
-# # adicionalmente se elimina la columna con la clasificacion anterior y todas las filas que quedaron 
-# # con igual clasificacion para el mismo ID
-# chefmozcuisine_clasificado <- unique(chefmozcuisine_clasificado[,-2])
-# 
-# # algunos placeID tienen mas de una propuesta. Considerando que ya se hizo el trabajo anterior de
-# # reagrupar los similares se decide dejar los que luego de esta modificacion mantienen mas de una propuesta
-# str(chefmozcuisine_clasificado)
-# head(chefmozcuisine_clasificado,10)
 
-```
-
-***Transformación de datos de ubicación
+### 2.1 - Transformación de datos de ubicación
 Para analizar las distancias gegraficas de los restaurantes se analiza la fuente de datos geoplaces2.csv que tiene un 21 variables para analizar. A continuación se muestran las carateristicas de las vaiables, tipos de datos y framento de valores a partir de la función *srt*
 
 ```{r Ubicación: geoplaces2.csv }
 geoplaces <- read.csv ("Dataset/geoplaces2.csv", sep = ',')
 str(geoplaces)
 ```
-
-Las primeras variables dentro de este set de datos que será analizadas son latitud(latitude) y longitud(longitude). A continuación se grafican los puntos para reivisar si distribución. 
+Las primeras variables dentro de este set de datos que será analizadas son latitud(latitude) y longitud(longitude). A continuación se grafican los puntos para identificar como están distribuidas. 
 ```{r Plot Coordenadas}
 geoCoord <- geoplaces[,1:3]
 plot(geoCoord[,2:3])
 ```
-Analizando como se gráfica las coordenadas podemos plantear que los restaurantes estan separado en 3 cuidades diferentes. Visualmente se identificicaron los punto de referencias aproximados y se contrastaron con su ubicación en el mapa para seleccionar los puntos. Se debe definir las distancias entre los restaurantes y 3 puntos de referencia para establecer un marco comparativo entre las posiciones de los resutantes y los puntos de referencia.Los puntos de referencia elejidos arbitrariamente fueron:
+Analizando como se gráfica las coordenadas podemos plantear que los restaurantes estan separado en 3 cuidades diferentes. Visualmente se identificicaron los punto de referencias aproximados y se contrastaron con su ubicación en el mapa para seleccionar los puntos. Se debe definir las distancias entre los restaurantes y 3 puntos de referencia para establecer un marco comparativo entre las posiciones de los resutantes y los puntos de referencia.Los puntos de referencia elegidos arbitrariamente fueron:
 22.156925, -100.985634 (San Luis Potosí)
 18.924490, -99.221556 (Morelos)
 23.732142, -99.148336 (Victoria.Tamaulipas)
@@ -163,7 +144,7 @@ dfDistance <- data.frame(placeID=geoplaces$placeID,distPoint1=distPoint1,distPoi
 #Obtener el index del valor mínimo que representa la ciudad permitiendo agruparlas
 for (i in seq(nrow(dfDistance))) {
   pCoord <- c(dfDistance$distPoint1[i],dfDistance$distPoint2[i],dfDistance$distPoint3[i])
-  dfDistance$classCity[i] <- as.numeric(which.min(pCoord))
+  dfDistance$classCity[i] <- if(as.numeric(which.min(pCoord)) == 1) {"A"} else if (as.numeric(which.min(pCoord)) == 2) {"B"} else "C"
 }
 head(dfDistance)
 ```
@@ -182,16 +163,52 @@ for (i in seq(nrow(smokingPlace))) {
                            || smokingPlace$smoking_area[i] == "section") T else F
 }
 
+smokingPlace$smoking_area <- NULL
+
 # Se muestran los primero 10 registros
 head(smokingPlace,10)
 ```
 
 *Analisis de los tipos de comida
-La primera variable a revisar es Rcuisine de la base chefmozcuisine.csv donde se identifica 59 tipos de comidas distribuida entre todos los restaurantes. Un restaurante tiene varios tipos de comida que ofrece. A continuación se muestra el resumen de los datos cargados y un ejemplo de 6 valores. 
+La primera variable a revisar es Rcuisine de la base chefmozcuisine.csv donde se identifica 59 tipos de comidas distribuida entre todos los restaurantes. Un restaurante tiene varios tipos de comida que ofrece. A continuación se muestra el resumen de los datos cargados y un ejemplo de 6 valores.
 ```{r Tpo Comida: chefmozcuisine.csv}
 chefmozcuisine <- read.csv ("Dataset/chefmozcuisine.csv", sep = ',')
 str(chefmozcuisine)
 head(chefmozcuisine)
+```
+Se realiza una reclasifacion utilizando pareto para reducir la cantidad de factores.
+```{r Distribución de frecuencia}
+head(freq(chefmozcuisine, "Rcuisine"), 20)
+
+cuisine_freq = freq(chefmozcuisine, "Rcuisine", plot = F)
+
+chefmozcuisineFrc <- chefmozcuisine
+chefmozcuisineFrc$Rcuisine = ifelse(chefmozcuisineFrc$Rcuisine %in% cuisine_freq[1:17,'Rcuisine'], chefmozcuisineFrc$Rcuisine, 'other')
+freq(chefmozcuisineFrc, 'Rcuisine')
+
+```
+Un corte razonable sería a partir del 80% de los datos, pero esto implicaria quedarnos con 17 variables (las transformaremos en variables debido a que los restaurantes en general aplican a mas de un tipo de comida por lo que tienen más de una fila para cada ID). Por otra parte observamos que existen varios tipos de comidas similares entre ellos, por lo que decidimos agruparlos generando una reclasificación para quedarnos con menos variables.
+
+```{r Grupo Comida}
+#Grupos de comidas
+chefmozcuisineAgg <- read.csv ("Dataset/Cuisine_agrupado.csv", sep = ';')
+
+# a continuacion se unen ambas tablas conservando todas las filas del dataset original y agregando
+# la columna con la nueva clasificacion.
+chefmozcuisineClass <- left_join(chefmozcuisine,chefmozcuisineAgg, by="Rcuisine")
+
+# adicionalmente se elimina la columna con la clasificacion anterior y todas las filas que quedaron
+# con igual clasificacion para el mismo ID
+chefmozcuisineClass <- unique(chefmozcuisineClass[,-2])
+
+#Normalizo la tabla
+chefmozcuisineClass <- tidyr::spread(data = chefmozcuisineClass, key = Cuisine_agrupada, value = Cuisine_agrupada)
+str(chefmozcuisineClass)
+
+chefmozcuisineClass[,-1] <- ifelse(is.na(chefmozcuisineClass[,-1]) == T , F , T)
+
+head(chefmozcuisineClass, 10)
+
 ```
 A partir de analisis anterior consideramos que aporta información de negocio determinar la cantidad de tipos de comida que ofrecen los restaurantes partiendo de la base que a mayor cantidad de ofertas permite un publico mas variado
 ```{r CREATE Tpo Comida: Cantidad Comida}
@@ -203,13 +220,14 @@ names(chefmozcuisineCont)[2] <- "foodCount"
 head(chefmozcuisineCont)
 ```
 
-Se analizan los días de atención de los reststaurantes. 
+
+Se analizan los días de atención de los restaurantes 
 
 ```{r Dias Atencion}
 # chefmozhours4_mod <- read.csv ("Dataset/chefmozhours4_modificado.csv", sep = ',')
 # str(chefmozhours4_mod)
 # #Levantar datos de dias de atencion y guardar
-# # 
+# #
 # 
 # chefmozhours4_mod$Days1 <- ifelse(chefmozhours4_mod$Days1 == "Mon", 1, (chefmozhours4_mod$Days1))
 # 
@@ -259,7 +277,7 @@ chefmozacceptsCant <- chefmozaccepts
 # #Seleccionamos las columnas que mantendremos
 # varsToKeep <- c("placeID",  "AMERICAN_EXPRESS", "BANK_DEBIT_CARDS", "CASH", "MASTERCARD-EUROCARD", "VISA")
 # chefmozaccepts <- chefmozaccepts[,varsToKeep]
-# chefmozaccepts[,2:6] <- ifelse(is.na(chefmozaccepts[,2:6]) == T , T , F)
+# chefmozaccepts[,2:6] <- ifelse(is.na(chefmozaccepts[,2:6]) == T , F , T)
 # head(chefmozaccepts, 10)
 ```
 Despues de analizado los datos se identifica que los restaurantes tienen varias opciones de medios de pagos por tanto se considera relevante para el analisis la cantidad de opciones que tiene cada restaurante.
@@ -295,12 +313,11 @@ head(ratings)
 otherAttributes <- geoplaces[,c("placeID","area","franchise","Rambience","price","accessibility","dress_code","alcohol")]
 str(otherAttributes)
 
-#Se convierte a logica la variable "franchise" 
-otherAttributes$franchise <- ifelse(toupper(otherAttributes$franchise) == "T",T,F)
+#Se convierte a logica la variable "franchise" ya que sus valores son t y f
+otherAttributes$franchise <- ifelse(toupper(otherAttributes$franchise) == "F",F,T)
 head(otherAttributes,10)
-print(levels(otherAttributes$alcohol))
 ```
-
+### Unión de todos los dataset
 Uniones entre las set de datos para generar la tabla principal de datos:
 ```{r Union entre dataset}
 
@@ -316,14 +333,14 @@ allRestaurant <- left_join(x = allRestaurant
                        all = TRUE)
 
 allRestaurant <- left_join(x = allRestaurant
-                       ,y = chefmozparking
+                       ,y = chefmozcuisineClass
                        ,by = "placeID",
                        all = TRUE)
 
-# allRestaurant <- left_join(x = allRestaurant
-#                        ,y = chefmozaccepts
-#                        ,by = "placeID",
-#                        all = TRUE)
+allRestaurant <- left_join(x = allRestaurant
+                       ,y = chefmozparking
+                       ,by = "placeID",
+                       all = TRUE)
 
 allRestaurant <- left_join(x = allRestaurant
                        ,y = chefmozacceptsCant
@@ -340,30 +357,36 @@ allRestaurant <- left_join(x = allRestaurant
                        ,by = "placeID",
                        all = TRUE)
 str(allRestaurant)
-head(allRestaurant)
-names(allRestaurant)
-print(ncol(allRestaurant))
-
+head(allRestaurant,20)
 ```
-## Analisis de los datos
+## 3. Exploración y analisis descriptivo
 
-```{r}
-
- resultado <- funModeling::df_status(allRestaurant)
+```{r Analisis de NA,Ceros,INF..}
+funModeling::df_status(allRestaurant)
 ```
+### 3.1 Tratamiento a valores NAs, Ceros y tipos de datos
 
+Identificamos que los valores isSmoking y franchise, hasParking son valores logicos pero no tienen NA pero los demas si deben transformados. Decidimos comvertir las variables logcias con presencia ded Na en variables categoricas (Factor)  y se agregará una nueva clasificación "otros" donde se agrupen los valores faltantes.
+Todos los valores de Cantidad de comida (foodCount) con valores Na seran convertidos a -1
+```{r Na Ceros y Tpos datos}
+#Convertir los Na de las variables numericas de cantidad de comidas y medios de pagos ofrecidos en -1 
+varsNumeric = c("foodCount", "payCount")
+allRestaurant = allRestaurant %>% mutate_at(.vars=varsNumeric, .funs = funs(ifelse(is.na(.), -1, .)))
 
-Analisis de datos faltantes y NAs y modificación de tipos de datos
-```{r Valores Faltantes}
+#Todas las variables con Na de los datos restantes de agruparan en la categoria Otros
+allRestaurant[is.na(allRestaurant)] ="OTROS"
 
+#Dtermino las variables definidas como caracter y las convierto a factor
+varLog <- unlist(lapply(allRestaurant, is.character))
+allRestaurant[,varLog] <- data.frame(sapply(allRestaurant[,varLog],as.factor))
 
+#Esta variable tiene el 83% de valores nulos por tanto de descarta del análisis
+allRestaurant$franchise <- NULL
 
-# dfAllRestaurant <- na.omit(allRestaurant)
-# dfAllRestaurant$smoking_area <- as.factor(dfAllRestaurant$smoking_area) 
-# dfAllRestaurant$isSmoking <- as.logical(dfAllRestaurant$isSmoking) 
-# 
-# str(dfAllRestaurant)
+#Se muestra el resuen del estatus de los datos
+funModeling::df_status(allRestaurant)
 ```
+Despues de la transformación que mantienen 130 observaciones con sus transformaciones aplicadas.
 
 ```{r Matriz Correlacion}
 # calculamos la matriz de correlacion 
@@ -391,78 +414,72 @@ allRestaurant[is.na(allRestaurant)] <- 0
 ```
 
 
-```{r}
-#Identificando outliers (Variables númericas)
+```{r Correlacion entre variables Num}
 varNun <- which(sapply(allRestaurant,is.numeric))
 allRestNum <- allRestaurant[,varNun]
-
-pairs.panels(allRestNum[,2:6], stars = TRUE)
-
+pairs.panels(allRestNum, stars = TRUE)
 ```
 
-PCA
-```{r}
-# Si tengo tiempo lo agrego
-# Ejemplo Análisis de componentes principales para variables mixtas (numéricas y categóricas)
+Identificamos las observaciones que tienen outliers. Decidimos mantenerlas en el dataset para al finaizar observar cual fue su comportamiento. En la grafica siguiente se visualiza que la observación 129 tiene presencia de outliers.
 
-## Librería
-# library(PCAmixdata)
-# 
-# ## Datos de ejemplo
-# data("gironde")
-# 
-# ## Estructura de la tabla
-# str(gironde) # sóllo hay variables numércias y factores
-# 
-# ## separamos numéricas de factores
-# separacion <- splitmix(gironde)
-# 
-# cuantitativas <- separacion$X.quanti
-# 
-# cualitativas <- separacion$X.quali
-# 
-# ## PCAmix
-# 
-# mixpca <- PCAmix(cuantitativas, cualitativas, rename.level = TRUE, graph = FALSE, ndim = 34)
-# 
-# 
-# # contribución a la varianza
-# 
-# mixpca$eig # ek 90.21732% de la varianza se acumula en el componente 20
-# 
-# ## scores componentes principales
-# 
-# b <- mixpca$scores
-# head(b)
-# 
-# c <- mixpca$scores.stand
-# head(c)
+```{r outliers}
+#Identificando outliers (Variables númericas)
+md <- mahalanobis(allRestNum, center = colMeans(allRestNum), cov = cov(allRestNum))
+alpha <- .005
+cutoff <- (qchisq(p = 1 - alpha, df = ncol(allRestNum)))
+outliersMH <- which(md > cutoff)
+outlierRest <- psych::outlier(allRestNum)
+print(outliersMH)
+```
+### 3.2 PCAMix
+Sea realiza la corrida del PCAMix que aplica para variables categoricar y numericas. El resultado nos arrojó que el 90% de la varianza se acumula en el componente 16.
+```{r PCAMix}
+# Separamos numéricas de factores
+separacion <- splitmix(allRestaurant)
+cuantitativas <- separacion$X.quanti
+cualitativas <- separacion$X.quali
+ 
+#PCAmix
+restMixPCA <- PCAmix(cuantitativas, cualitativas, rename.level = TRUE, graph = FALSE, ndim = 31)
+ 
+# Contribución a la varianza
+restMixPCA$eig # el 90% de la varianza se acumula en el componente 16
 
+#Se corre nuevamente para 16 dimensiones que es donde se acumula más del 90% de la varianza
+restMixPCA <- PCAmix(cuantitativas, cualitativas, rename.level = TRUE, graph = FALSE, ndim = 16)
+
+allRestScores <- data.frame(restMixPCA$scores.stand)
+head(allRestScores)
 ```
 
+### 3.2 Distancia de Gower
 
-```{r Distancia de Gower, warning=FALSE}
-dfGowerDist <- daisy(dfAllRestaurant, metric = "gower")
+```{r Distancia de Gower allRestaurant, warning=FALSE}
+dfGowerDist <- daisy(allRestaurant, metric = "gower")
 
 #Generar el histograma dfGowerDist
-hist(dfGowerDist, xlim = range(0.0,1.0), main = "Histograma de distancia de Gower")
+hist(dfGowerDist, xlim = range(0.0,1.0), main = "Histograma de distancia de Gower - allRestaurant")
 ```
-# Fase 4: Modelado
 
+```{r Distancia de Gower PCAMix}
+dfGowerDistPCA <- daisy(allRestScores, metric = "gower")
 
+#Generar el histograma dfGowerDist
+hist(dfGowerDistPCA, xlim = range(0.0,1.0), main = "Histograma de distancia de Gower - PCAMix")
+```
+
+# Fase 4: Modelado y Evaluación
 
 ## 4.1 - Modelo: Diana
-Modelo divisivo Diana
+
 ```{r Modelado: Divisivo - Diana}
 clustDianaDiv <- diana(as.matrix(dfGowerDist),diss = TRUE, keep.diss = TRUE)
 plot(clustDianaDiv, main = "Divisive")
 ```
 
-## 4.1.1 - Evaluación
-
-### 4.1.1.1 Análisis del Elbow
+### 4.1.1 Análisis del Elbow
 ```{r Evaluación: Diana - Elbow }
-ggplot(data = data.frame(t(cstats.table(dfGowerDist, clustModelDiv, 15))), 
+ggplot(data = data.frame(t(cstats.table(dfGowerDist, clustDianaDiv, 15))), 
   aes(x=cluster.number, y=within.cluster.ss)) + 
   geom_point()+
   geom_line()+
@@ -471,7 +488,7 @@ ggplot(data = data.frame(t(cstats.table(dfGowerDist, clustModelDiv, 15))),
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 4.1.1.2 Análisis de la Silueta
+### 4.1.2 Análisis de la Silueta
 ```{r Evaluación: Diana - Silueta }
 clusDiana <- eclust(x = dfGowerDist, FUNcluster = "diana", k = 6, seed = 123,
                       hc_metric = "euclidean", nstart = 50, graph = FALSE)
@@ -479,16 +496,41 @@ fviz_silhouette(sil.obj = clusDiana, print.summary = TRUE, palette = "jco",
                 ggtheme = theme_classic())
 ```
 
-### 4.1.1.3 Poda del arbol
-```{r Diana: Cortar el arbol}
-groupsDiana <- as.factor(cutree(aggl.clust.c, k=6))
-head(groupsDiana)
+
+## 4.2 - Modelo: Diana con PCAMix
+
+```{r Modelado: Divisivo - Diana (PCAMix)}
+clustDianaPCAmix <- diana(as.matrix(dfGowerDistPCA),diss = TRUE, keep.diss = TRUE)
+plot(clustDianaPCAmix, main = "Divisive")
 ```
+
+
+### 4.2.1 Análisis del Elbow
+```{r Evaluación: Diana - Elbow (PCAMinx) }
+ggplot(data = data.frame(t(cstats.table(dfGowerDistPCA, clustDianaPCAmix, 15))), 
+  aes(x=cluster.number, y=within.cluster.ss)) + 
+  geom_point()+
+  geom_line()+
+  ggtitle("Divisive clustering") +
+  labs(x = "Num.of clusters", y = "Within clusters sum of squares (SS)") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+### 4.2.2 Análisis de la Silueta
+```{r Evaluación: Diana - Silueta (PCAMinx) }
+clusDianaPCA <- eclust(x = dfGowerDistPCA, FUNcluster = "diana", k = 6, seed = 123,
+                      hc_metric = "euclidean", nstart = 50, graph = FALSE)
+fviz_silhouette(sil.obj = clusDianaPCA, print.summary = TRUE, palette = "jco",
+                ggtheme = theme_classic())
+
+```
+
+
 
 ## 4.2 - Modelo: HCLUST
 Modelo aglomerativo HCLUST
 
-### 4.2.1 HCLUST: Definición del metodo
+### 4.2.1 HCLUST: Definición del método
 Realizaremos una corrida para cada metodo de hclust para identificar cual es el que tiene mayor numero de correlacion según los metodos posibles.
 ```{r Metodo Aglomerativo: Difinición del metodo}
 # Metodo hclust (Hierarchical Agglomerative Clustering)
@@ -510,7 +552,7 @@ print(paste("method: ward.D =",cor(dfGowerDist,C3)))
 print(paste("method: single =",cor(dfGowerDist,C4)))
 
 ```
-El metodo que con mayor cohefiente de correlacion fue el average con un 0.81 por tanto utilizaremos este metodo para el modelado.
+El metodo que con mayor cohefiente de correlacion fue el "average" con un 0.81 por tanto utilizaremos este metodo para el modelado.
 
 ### 4.2.2 Modelo: hclust
 A partir del metodo definido en el epigrafe anterior se realiza la corrida del modelo
@@ -541,6 +583,39 @@ fviz_silhouette(sil.obj = clusHclust, print.summary = TRUE, palette = "jco",
                 ggtheme = theme_classic())
 ```
 
+
+
+### 4.2.2 Modelo: hclust (PCAMix)
+A partir del metodo definido en el epígrafe anterior se realiza la corrida del modelo utilizando PCAMix
+```{r Metodo Aglomerativo: hclust(PCAMix)}
+clustHclustAgglPCA <- hclust(dfGowerDistPCA, method = "average")
+
+plot(clustHclustAgglPCA, main = "Agglomerative, complete linkages")
+```
+
+## 4.2.3 - Evaluación
+
+### 4.2.3.1 - Análisis del Elbow
+```{r Evaluación: hclust - Elbow(PCAMix)}
+ggplot(data = data.frame(t(cstats.table(dfGowerDistPCA, clustHclustAgglPCA, 15))), 
+  aes(x=cluster.number, y=within.cluster.ss)) + 
+  geom_point()+
+  geom_line()+
+  ggtitle("Divisive clustering") +
+  labs(x = "Num.of clusters", y = "Within clusters sum of squares (SS)") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+### 4.2.3.2 - Análisis de la Silueta
+```{r Evaluación: hclust - Silueta (PCAMix)}
+clusHclustPCA <- eclust(x = dfGowerDistPCA, FUNcluster = "hclust", k = 6, seed = 123,
+                      hc_metric = "euclidean", nstart = 50, graph = FALSE)
+fviz_silhouette(sil.obj = clusHclustPCA, print.summary = TRUE, palette = "jco",
+                ggtheme = theme_classic())
+```
+
+
+
 ### 4.2.3.3 - Poda del arbol
 ```{r hclust: Cortar el arbol}
 groupsHclust <- as.factor(cutree(clustHclustAggl, k=5))
@@ -549,8 +624,8 @@ summary(groupsHclust)
 ## 4.2.3 - Almacenar los datos
 
 ```{r}
-dfAllRestaurant$clusterDiana <- groupsDiana
-dfAllRestaurant$clusterHclust <- groupsHclust
-head(dfAllRestaurant)
+# allRestaurant$clusterDiana <- groupsDiana
+# allRestaurant$clusterHclust <- groupsHclust
+# head(allRestaurant)
 ```
 
