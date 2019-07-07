@@ -69,36 +69,38 @@ set.seed(123)
 Se cargan las librerías utilizadas para el proceso
 ```{r Librerías, message=FALSE, warning=FALSE, paged.print=FALSE}
 # library(magrittr)
-library(plyr)
-library(dplyr)
-library(Hmisc)
-library(cluster)
-# library(tidyverse)
-# library(modelr)
-# library(funModeling)
-# library(ggplot2)
-library(ggcorrplot)
-# library(MASS)
-# library(GGally)
-# library(simstudy)
-# library(foreign)
-# library(feather)
-# library(data.table)
-# library(jtools)
-# library(purrr)
-library(tidyr)
-# library(XML)
-# library(xml2)
-# library(jsonlite)
-# library(rjson)
-# library(stringi)
-# library(here)
-# library(PCAmixdata)
- library(psych)
-# library(factoextra)
-
+library(plyr) # OK
+library(dplyr) # OK
+library(Hmisc) # OK
+library(cluster) # OK
+library(tidyverse)
+library(modelr)
+library(funModeling)
+library(ggplot2)
+library(ggcorrplot) # OK
+library(MASS)
+library(GGally)
+library(simstudy)
+library(foreign)
+library(feather)
+library(data.table)
+library(jtools)
+library(purrr)
+library(tidyr) # OK
+library(XML)
+library(xml2)
+library(jsonlite)
+library(rjson)
+library(stringi)
+library(here)
+library(PCAmixdata)
+ 
+library(psych) # OK
+library(factoextra)
+library(fpc) #OK
 #Distancias Geograficas
 library(sp)
+source("Utility/tablaresumen.R")
 ```
 
 El dataset original tiene 59 niveles de tipos de comida. Para trabajar con menos niveles y obtener mejores resultados a la hora de realizar el cluster se realzó una revisión general y se estableció una lista resudic
@@ -249,16 +251,16 @@ chefmozaccepts <- unique(chefmozaccepts)
 
 #Genero el mismo set de datos para genera posteriormente
 chefmozacceptsCant <- chefmozaccepts
-
-# Se normaliza todos los valores de medio de pago
-chefmozaccepts <- tidyr::spread(data = chefmozaccepts, key = Rpayment, value = Rpayment)
-print(colnames(chefmozaccepts))
-
-#Seleccionamos las columnas que mantendremos
-varsToKeep <- c("placeID",  "AMERICAN_EXPRESS", "BANK_DEBIT_CARDS", "CASH", "MASTERCARD-EUROCARD", "VISA")
-chefmozaccepts <- chefmozaccepts[,varsToKeep]
-chefmozaccepts[,2:6] <- ifelse(is.na(chefmozaccepts[,2:6]) == T , T , F)
-head(chefmozaccepts, 10)
+# 
+# # Se normaliza todos los valores de medio de pago
+# chefmozaccepts <- tidyr::spread(data = chefmozaccepts, key = Rpayment, value = Rpayment)
+# print(colnames(chefmozaccepts))
+# 
+# #Seleccionamos las columnas que mantendremos
+# varsToKeep <- c("placeID",  "AMERICAN_EXPRESS", "BANK_DEBIT_CARDS", "CASH", "MASTERCARD-EUROCARD", "VISA")
+# chefmozaccepts <- chefmozaccepts[,varsToKeep]
+# chefmozaccepts[,2:6] <- ifelse(is.na(chefmozaccepts[,2:6]) == T , T , F)
+# head(chefmozaccepts, 10)
 ```
 Despues de analizado los datos se identifica que los restaurantes tienen varias opciones de medios de pagos por tanto se considera relevante para el analisis la cantidad de opciones que tiene cada restaurante.
 Se consideró como una nueva variable la cantidad de medios de pagos que tiene cada restaurante.
@@ -318,10 +320,10 @@ allRestaurant <- left_join(x = allRestaurant
                        ,by = "placeID",
                        all = TRUE)
 
-allRestaurant <- left_join(x = allRestaurant
-                       ,y = chefmozaccepts
-                       ,by = "placeID",
-                       all = TRUE)
+# allRestaurant <- left_join(x = allRestaurant
+#                        ,y = chefmozaccepts
+#                        ,by = "placeID",
+#                        all = TRUE)
 
 allRestaurant <- left_join(x = allRestaurant
                        ,y = chefmozacceptsCant
@@ -337,16 +339,30 @@ allRestaurant <- left_join(x = allRestaurant
                        ,y = otherAttributes
                        ,by = "placeID",
                        all = TRUE)
-
+str(allRestaurant)
 head(allRestaurant)
+names(allRestaurant)
+print(ncol(allRestaurant))
+
 ```
+## Analisis de los datos
+
+```{r}
+
+ resultado <- funModeling::df_status(allRestaurant)
+```
+
+
 Analisis de datos faltantes y NAs y modificación de tipos de datos
 ```{r Valores Faltantes}
-dfAllRestaurant <- na.omit(allRestaurant)
-dfAllRestaurant$smoking_area <- as.factor(dfAllRestaurant$smoking_area) 
-dfAllRestaurant$isSmoking <- as.logical(dfAllRestaurant$isSmoking) 
 
-str(dfAllRestaurant)
+
+
+# dfAllRestaurant <- na.omit(allRestaurant)
+# dfAllRestaurant$smoking_area <- as.factor(dfAllRestaurant$smoking_area) 
+# dfAllRestaurant$isSmoking <- as.logical(dfAllRestaurant$isSmoking) 
+# 
+# str(dfAllRestaurant)
 ```
 
 ```{r Matriz Correlacion}
@@ -380,7 +396,7 @@ allRestaurant[is.na(allRestaurant)] <- 0
 varNun <- which(sapply(allRestaurant,is.numeric))
 allRestNum <- allRestaurant[,varNun]
 
-pairs.panels(allRestNum, stars = TRUE)
+pairs.panels(allRestNum[,2:6], stars = TRUE)
 
 ```
 
@@ -425,85 +441,116 @@ PCA
 ```
 
 
-```{r Distancia de Gower}
-dfGowerDist <- daisy(dfAllRestaurant, metric = c("gower"))
-class(dfGowerDist)
-hist(dfGowerDist, xlim = range(0.0,1.0))
+```{r Distancia de Gower, warning=FALSE}
+dfGowerDist <- daisy(dfAllRestaurant, metric = "gower")
+
+#Generar el histograma dfGowerDist
+hist(dfGowerDist, xlim = range(0.0,1.0), main = "Histograma de distancia de Gower")
+```
+# Fase 4: Modelado
+
+
+
+## 4.1 - Modelo: Diana
+Modelo divisivo Diana
+```{r Modelado: Divisivo - Diana}
+clustDianaDiv <- diana(as.matrix(dfGowerDist),diss = TRUE, keep.diss = TRUE)
+plot(clustDianaDiv, main = "Divisive")
 ```
 
+## 4.1.1 - Evaluación
 
-```{r Clustering divisivo}
-divisive.clust <- diana(as.matrix(dfGowerDist), 
-                        diss = TRUE, keep.diss = TRUE)
-plot(divisive.clust, main = "Divisive")
-```
-
-```{r Metodo Aglomerativo}
-aggl.clust.c <- hclust(dfGowerDist, method = "complete")
-
-plot(aggl.clust.c,
-     main = "Agglomerative, complete linkages")
-```
-
-
-
-
-
-```{r Evaluación}
-
-
-
-
-# # 3 evaluar
-# # método del codo
-# Elbow
-stats.df.divisive <- cstats.table(gower.dist, divisive.clust, 7)
-
-ggplot(data = data.frame(t(cstats.table(dfGowerDist, tree, 17))), 
+### 4.1.1.1 Análisis del Elbow
+```{r Evaluación: Diana - Elbow }
+ggplot(data = data.frame(t(cstats.table(dfGowerDist, clustModelDiv, 15))), 
   aes(x=cluster.number, y=within.cluster.ss)) + 
   geom_point()+
   geom_line()+
   ggtitle("Divisive clustering") +
   labs(x = "Num.of clusters", y = "Within clusters sum of squares (SS)") +
   theme(plot.title = element_text(hjust = 0.5))
-# # método de la silueta
 ```
 
+### 4.1.1.2 Análisis de la Silueta
+```{r Evaluación: Diana - Silueta }
+clusDiana <- eclust(x = dfGowerDist, FUNcluster = "diana", k = 6, seed = 123,
+                      hc_metric = "euclidean", nstart = 50, graph = FALSE)
+fviz_silhouette(sil.obj = clusDiana, print.summary = TRUE, palette = "jco",
+                ggtheme = theme_classic())
+```
+
+### 4.1.1.3 Poda del arbol
+```{r Diana: Cortar el arbol}
+groupsDiana <- as.factor(cutree(aggl.clust.c, k=6))
+head(groupsDiana)
+```
+
+## 4.2 - Modelo: HCLUST
+Modelo aglomerativo HCLUST
+
+### 4.2.1 HCLUST: Definición del metodo
+Realizaremos una corrida para cada metodo de hclust para identificar cual es el que tiene mayor numero de correlacion según los metodos posibles.
+```{r Metodo Aglomerativo: Difinición del metodo}
+# Metodo hclust (Hierarchical Agglomerative Clustering)
+H1=hclust(dfGowerDist,method='average')
+H2=hclust(dfGowerDist,method='complete')
+H3=hclust(dfGowerDist,method='ward.D')
+H4=hclust(dfGowerDist,method='single')
+
+#Obteniendo el coheficiente de correlación para cada metodo
+C1=cophenetic(H1)
+C2=cophenetic(H2)
+C3=cophenetic(H3)
+C4=cophenetic(H4)
+
+
+print(paste("method: average =",cor(dfGowerDist,C1)))
+print(paste("method: complete =",cor(dfGowerDist,C2)))
+print(paste("method: ward.D =",cor(dfGowerDist,C3)))
+print(paste("method: single =",cor(dfGowerDist,C4)))
+
+```
+El metodo que con mayor cohefiente de correlacion fue el average con un 0.81 por tanto utilizaremos este metodo para el modelado.
+
+### 4.2.2 Modelo: hclust
+A partir del metodo definido en el epigrafe anterior se realiza la corrida del modelo
+```{r Metodo Aglomerativo: hclust}
+clustHclustAggl <- hclust(dfGowerDist, method = "average")
+
+plot(clustHclustAggl, main = "Agglomerative, complete linkages")
+```
+
+## 4.2.3 - Evaluación
+
+### 4.2.3.1 - Análisis del Elbow
+```{r Evaluación: hclust - Elbow}
+ggplot(data = data.frame(t(cstats.table(dfGowerDist, clustHclustAggl, 15))), 
+  aes(x=cluster.number, y=within.cluster.ss)) + 
+  geom_point()+
+  geom_line()+
+  ggtitle("Divisive clustering") +
+  labs(x = "Num.of clusters", y = "Within clusters sum of squares (SS)") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+### 4.2.3.2 - Análisis de la Silueta
+```{r Evaluación: hclust - Silueta}
+clusHclust <- eclust(x = dfGowerDist, FUNcluster = "hclust", k = 6, seed = 123,
+                      hc_metric = "euclidean", nstart = 50, graph = FALSE)
+fviz_silhouette(sil.obj = clusHclust, print.summary = TRUE, palette = "jco",
+                ggtheme = theme_classic())
+```
+
+### 4.2.3.3 - Poda del arbol
+```{r hclust: Cortar el arbol}
+groupsHclust <- as.factor(cutree(clustHclustAggl, k=5))
+summary(groupsHclust)
+```
+## 4.2.3 - Almacenar los datos
+
 ```{r}
-# 3) Evaluar
-# Número óptimo de clusters: método del codo
-# Validación interna: método de la silueta
-
-
-stats.df.divisive <- cstats.table(gower.dist, divisive.clust, 7)
-
-# Elbow
-# Divisive clustering
-library(ggplot2)
-ggplot(data = data.frame(t(cstats.table(gower.dist, divisive.clust, 15))), 
-       aes(x=cluster.number, y=within.cluster.ss)) + 
-  geom_point()+
-  geom_line()+
-  ggtitle("Divisive clustering") +
-  labs(x = "Num.of clusters", y = "Within clusters sum of squares (SS)") +
-  theme(plot.title = element_text(hjust = 0.5))
-
-# Agglomerative clustering
-ggplot(data = data.frame(t(cstats.table(gower.dist, aggl.clust.c, 15))), 
-       aes(x=cluster.number, y=within.cluster.ss)) + 
-  geom_point()+
-  geom_line()+
-  ggtitle("Agglomerative clustering") +
-  labs(x = "Num.of clusters", y = "Within clusters sum of squares (SS)") +
-  theme(plot.title = element_text(hjust = 0.5))
-
-# silhouette
-ggplot(data = data.frame(t(cstats.table(gower.dist, divisive.clust, 15))), 
-       aes(x=cluster.number, y=avg.silwidth)) + 
-  geom_point()+
-  geom_line()+
-  ggtitle("Divisive clustering") +
-  labs(x = "Num.of clusters", y = "Average silhouette width") +
-  theme(plot.title = element_text(hjust = 0.5))
+dfAllRestaurant$clusterDiana <- groupsDiana
+dfAllRestaurant$clusterHclust <- groupsHclust
+head(dfAllRestaurant)
 ```
 
