@@ -19,7 +19,7 @@ A estos efectos, cuenta con una base de datos de restoranes, a la cual se puede 
 
 ### 1.1 Discuta el desafío planteado en términos de la importancia que tiene para una empresa cualquiera y para Rest-on en particular
 Ofrecer recomendaciones que generan valor para los clientes es un objetivo para Rest-ON. No es solo recomendar una opción al cliente, sino que esta desarrolle una conexión con la marca y los clientes vean en la empresa un asesoramiento fundamentado.  Por tanto, es objetivo realizar un este análisis permitiendo que los clientes no solo encuentren lo que están buscando, sino que se identifiquen con el servicio. 
-Este desafió está presente en todas aquellas empresas en su valor de negocio esté vinculado con la fidelidad de los clientes que trabajan con la marca.  
+Este desafio está presente en todas aquellas empresas en que su valor de negocio esté vinculado con la fidelidad de los clientes que trabajan con la marca.  
 
 ### 1.2	Identifique conceptual y técnicamente qué tipo de modelos serían necesarios para atender este problema  
 Para ofrecer una información que genere valor para el cliente se deben clasificar correctamente los restaurantes a partir de las características que estos poseen y los servicios que ofrece, también se puede tener en cuenta las características propias de los usuarios que visitan los restaurantes que permita realizar una segmentación en función de las características de los usuarios. 
@@ -69,24 +69,26 @@ Evaluación: Se utilizarán técnicas como silueta y elbow para ajustar los mode
 Si bien todas las etapas comentadas anteriormente se hacen en forma secuencial, el modelo prevé la posibilidad de regresar a una fase anterior para revisarla y retomar nuevamente el proceso.  
 
 **Gestión de proyecto**   
-Para la implementación del proyecto se realizara entre el equipo un control de toda la versión del proyecto y se genera un repositorio para el seguimiento y control de código. Utilizando buenas prácticas reduce la posible generación de errores en los controles de cambio.  
+Para la implementación del proyecto se realizará entre el equipo un control de toda la versión del proyecto y se generará un repositorio para el seguimiento y control de código. Utilizando buenas prácticas se reduce la posible generación de errores en los controles de cambio.Utilizaremos Github para realizar el seguimiento de las versiones de la documentación.   
 
 ![](Exercise/Fases Metodologia.png)
 
 
-Para el desarrollo de este trabajo se propone utilizar la metodología CRISP–DM.
-Dicha metodología abarca desde el entendimiento del negocio hasta el despliegue de la solución sin dejar de lado las tareas de gestión de proyectos que permiten el monitoreo de la evolución del proyecto controlando tiempos, costos y riesgos asociados.
-
-  Gestion de proyecto:
-  Para la implementacion del proyecto se realizara entre el equipo un control de toda la version del proyecto y se genera un repositorio para el segimiento y control de codigo. Utilizando buenas practias reduce la posible generacion de errores en los controloes de cambio.
-
 ### 1.6	¿Cómo será utilizado el resultado del trabajo por el cliente? 
-El resultado o solución va a ser utilizado por la agencia turística para incluirlo en su motor de búsqueda y ofrecer un servicio que beneficie a sus usuarios, generando más volumen de visitas a su sitio y fidelizándolos. También será usado por los asesores de la empresa utilizarán el sitio para ofrecer a los vacacionistas mejores recomendaciones según sus necesidades y las características de los restaurantes.  
-Los restaurantes en la medida que este motor de búsqueda y recomendaciones tenga mayor difusión se beneficiaran por tener mayor publicidad y el perfil de clientes que se sienta más cómodo respecto la propuesta que ofrece.  
+
+El resultado o solución va a ser utilizado por la agencia turística para incluirlo en su motor de búsqueda y ofrecer un servicio que beneficie a sus usuarios, generando más volumen de visitas a su sitio y fidelizándolos. 
+
+También será usado por los asesores de la empresa que utilizarán el sitio para ofrecer a los vacacionistas mejores recomendaciones según sus necesidades y las características de los restaurantes.  
+
+Los restaurantes en la medida que este motor de búsqueda y recomendaciones tenga mayor difusión se beneficiarán por tener mayor publicidad y el perfil de clientes que se sienta más cómodo respecto la propuesta que ofrece.  
+
 El usuario en la medida que el motor de búsqueda sea reconocido y fiable en cuanto a las recomendaciones podrá disfrutar de opciones más adecuadas a sus preferencias.   
  
 ### 1.7	En base a lo anterior, ¿Qué áreas se deberían involucrar en el proyecto y qué rol cumplirían?
-Para la ejecución exitosa del proyecto tendría que participar todas las áreas que estarán en el ciclo completo del proyecto, desde la definición hasta su puesta en producción y mantenimiento del proyecto. En tres las áreas identificadas están comercial, marketing y el área de soporte técnico que son quienes más conocen a los usuarios de la guía. Por otro lado el área de operaciones y IT al conocer como manejar la gestión de la empresa realizarán la captura de datos y recopilación de datos de los diferentes restaurantes. Finalmente, el área financiera deberá verificar los impactos económicos de las iniciativas y el equipo de Analistas de Datos para interactuar con los restantes interlocutores.
+
+Para la ejecución exitosa del proyecto tendrían que participar todas las áreas que estarán en el ciclo completo del proyecto, desde la definición hasta su puesta en producción y mantenimiento del proyecto. 
+
+Entre las áreas identificadas están comercial, marketing y el área de soporte técnico que son quienes más conocen a los usuarios de la guía. Por otro lado el área de operaciones y IT al conocer como manejar la gestión de la empresa realizarán la captura y recopilación de los datos de los diferentes restaurantes. Finalmente, el área financiera deberá verificar los impactos económicos de las iniciativas y el equipo de Analistas de Datos para interactuar con los restantes interlocutores.
 
 ## 2. Extracción, Transformación o Carga de datos
 ### 2.1	Diseñe la estructura de tabla datos analítica: ¿qué va a ser cada fila? cuáles van a ser las columnas.  
@@ -96,6 +98,7 @@ La tabla analítica resultante de esta etapa contará de ID de restaurantes en l
 > Ver anexo *Datos complementarios.xlsx* la pestaña **Tabla**
 
 ### 2.2	¿Cómo se construye cada una de las variables en la tabla de datos? ¿De qué tablas surge y qué transformaciones de datos son necesarias?
+
 En el archivo adjunto “Datos complementarios.xlsx” se especifican las características de las variables seleccionadas, cuál será la fuente de información y que transformación se le hará a cada una.  
 
 > Ver anexo *Datos complementarios.xlsx* la pestaña **Tabla**
@@ -104,12 +107,15 @@ En el archivo adjunto “Datos complementarios.xlsx” se especifican las caract
 
 Finalmente se ensamblan todas las variable en la tabla analítica a partir de los ID de restaurantes de la tabla de geoplaces. Esto es debido a que a pesar de que tiene notoriamente menos registros que los restantes dataset, contiene información muy relevante al momento de realizar el cluster, por lo que decidimos reducir la cantidad de restaurantes en pos de enriquecer el análisis.  
 Se trabaja en la corrección de los registros con NA en las variables donde están presentes definiéndolos con un valor diferente a los existentes de forma de tenerlos identificados. 
-A modo aclaratorio comentamos que los dataset de los usuarios no fueron utilizados ya que no están identificados como usuarios de los restaurantes por lo que no aportan información relevante para el perfil de clientes y adicionalmente no agregan información que ya no este contenida en los datasets de los restaurantes.
+
+A modo aclaratorio comentamos que los dataset de los usuarios no fueron utilizados ya que no están identificados como usuarios de los diferentes  restaurantes por lo que no aportan información relevante para el perfil de clientes.
+
+Adicionalmente las caracteristicas contenidas en los mismos como ser medios de pagos y perfil de clientes ya esta presente en los datasets de los restaurantes.
 
 A continuación se detalla todo el proceso de ETL realizado para cada una de las variables.
 
 **Preparación del entrono de trabajo**  
-Se cargan todas 
+Se cargan todas las librerías a ser utilizadas
 ```{r Librerias, message=FALSE, warning=FALSE, include=FALSE}
 library(plyr) # OK
 library(dplyr) # OK
@@ -151,7 +157,8 @@ set.seed(123)
 ```
 
 #### 2.1 - Transformación de datos de ubicación
-Para analizar las distancias gegraficas de los restaurantes se analiza la fuente de datos geoplaces2.csv que tiene un 21 variables para analizar. A continuación se muestran las carateristicas de las vaiables, tipos de datos y framento de valores a partir de la función *srt*
+
+Para analizar las distancias gegráficas de los restaurantes se analiza la fuente de datos geoplaces2.csv que tiene un 21 variables para analizar. A continuación se muestran las carateristicas de las vaiables, tipos de datos y framento de valores a partir de la función *srt*
 
 ```{r Ubicación: geoplaces2.csv }
 geoplaces <- read.csv ("Dataset/geoplaces2.csv", sep = ',')
@@ -162,6 +169,7 @@ Las primeras variables dentro de este set de datos que será analizadas son lati
 geoCoord <- geoplaces[,1:3]
 plot(geoCoord[,2:3])
 ```
+
 Analizando como se gráfica las coordenadas podemos plantear que los restaurantes estan separado en 3 cuidades diferentes. Visualmente se identificicaron los punto de referencias aproximados y se contrastaron con su ubicación en el mapa para seleccionar los puntos. Se debe definir las distancias entre los restaurantes y 3 puntos de referencia para establecer un marco comparativo entre las posiciones de los resutantes y los puntos de referencia.Los puntos de referencia elegidos arbitrariamente fueron:
 22.156925, -100.985634 (San Luis Potosí)
 18.924490, -99.221556 (Morelos)
@@ -192,9 +200,9 @@ for (i in seq(nrow(dfDistance))) {
 head(dfDistance)
 ```
 
-Entre los datos identificados en la fuente de datos geoplaces2.csv se encuentra la variable smoking_area la cul fue analizada e identificamos que los siguientes valores unicos (none, not permitted,only at bar,permitted,section). Vamos a transforma esta variable en logica para establecer si el restaurantes permite o no fumar vajo ciertas condiciones. Se realizá un conversión a valores True para only_at_bar, permitted, section and False para los demas
+Entre los datos identificados en la fuente de datos geoplaces2.csv se encuentra la variable smoking_area la cual fue analizada e identificamos los siguientes valores únicos: none, not permitted,only at bar,permitted,section). Vamos a transformar esta variable en lógica para establecer si el restaurante permite o no fumar bajo ciertas condiciones. Se realizá un conversión a valores True para only_at_bar, permitted, section and False para los demás
 ```{r ¿Fumadores? isSmoking}
-# Se carga la variables a analizar.
+# Se carga la variable a analizar.
 smokingPlace <- geoplaces[,c("placeID","smoking_area")]
 levels(smokingPlace$smoking_area)
 smokingPlace$smoking_area <- tolower(smokingPlace$smoking_area)
@@ -213,7 +221,9 @@ head(smokingPlace,10)
 ```
 
 *Analisis de los tipos de comida
-La primera variable a revisar es Rcuisine de la base chefmozcuisine.csv donde se identifica 59 tipos de comidas distribuida entre todos los restaurantes. Un restaurante tiene varios tipos de comida que ofrece. A continuación se muestra el resumen de los datos cargados y un ejemplo de 6 valores.
+
+Analizamos la variable Rcuisine de la base chefmozcuisine.csv donde se identifica 59 tipos de comidas distribuida entre todos los restaurantes. Un restaurante puede tener varios tipos de comida. A continuación se muestra el resumen de los datos cargados y un ejemplo de 6 valores.
+
 ```{r Tpo Comida: chefmozcuisine.csv}
 chefmozcuisine <- read.csv ("Dataset/chefmozcuisine.csv", sep = ',')
 str(chefmozcuisine)
@@ -230,25 +240,28 @@ chefmozcuisineFrc$Rcuisine = ifelse(chefmozcuisineFrc$Rcuisine %in% cuisine_freq
 freq(chefmozcuisineFrc, 'Rcuisine')
 
 ```
-Un corte razonable sería a partir del 80% de los datos, pero esto implicaria quedarnos con 17 variables (las transformaremos en variables debido a que los restaurantes en general aplican a mas de un tipo de comida por lo que tienen más de una fila para cada ID). Por otra parte observamos que existen varios tipos de comidas similares entre ellos, por lo que decidimos agruparlos generando una reclasificación para quedarnos con menos variables.
+Un corte razonable sería a partir del 80% de los datos, pero esto implicaria quedarnos con 17 variables (las transformaremos en variables debido a que los restaurantes en general aplican a más de un tipo de comida por lo que tienen más de una fila para cada ID). Por otra parte observamos que existen varios tipos de comidas similares entre ellos, por lo que decidimos agruparlos generando una reclasificación para quedarnos con menos variables.
 
 ```{r Tpo Comida: Tipos}
 #Grupos de comidas
 chefmozcuisineAgg <- read.csv ("Dataset/Cuisine_agrupado.csv", sep = ';')
 names(chefmozcuisineAgg)[2] <- "TypeCuisine"
-# a continuacion se unen ambas tablas conservando todas las filas del dataset original y agregando
-# la columna con la nueva clasificacion.
+# a continuación se unen ambas tablas conservando todas las filas del dataset original y agregando
+# la columna con la nueva clasificación.
 chefmozcuisineClass <- left_join(chefmozcuisine,chefmozcuisineAgg, by="Rcuisine")
 
 # adicionalmente se elimina la columna con la clasificacion anterior y todas las filas que quedaron
 # con igual clasificacion para el mismo ID
 chefmozcuisineClass <- unique(chefmozcuisineClass[,-2])
-chefmozcuisineClass <- chefmozcuisineClass[!duplicated(chefmozcuisineClass[,c("placeID")]),]
+chefmozcuisineClass <- 
+  
+# luego de correr los modelos detectamos que al poner como variables los tipos de comida, todos los restaurantes que aparecían con NA por no tener ese tipo de comida y posteriormente pasarlos a "Otros" se clusterizaron juntos debido a la alta frecuencia del atributo. Por tal razón decidimos seguir trabajando en agruparlos para no perder información y transformarlos en una variable única. Luego de este trabajo solo 5 restaurantes perdieron un tipo de comida y en varios casos el segundo tipo era "otro" por lo que tampoco se perdio información relevante.   
+chefmozcuisineClass[!duplicated(chefmozcuisineClass[,c("placeID")]),]
 
 head(chefmozcuisineClass, 10)
 str(chefmozcuisineClass)
 ```
-A partir de analisis anterior consideramos que aporta información de negocio determinar la cantidad de tipos de comida que ofrecen los restaurantes partiendo de la base que a mayor cantidad de ofertas permite un publico mas variado
+A partir de analisis anterior consideramos que aporta información de negocio determinar la cantidad de tipos de comida que ofrecen los restaurantes partiendo de la base que a mayor cantidad de ofertas permite un publico mas variado. Para esto utilizamos el dataset original en lugar del agrupado.
 ```{r CREATE Tpo Comida: Cantidad Comida}
 chefmozcuisineCont <-chefmozcuisine%>%
                       group_by(placeID)%>%
@@ -259,7 +272,7 @@ head(chefmozcuisineCont)
 ```
 
 
-Se analizan los días de atención de los restaurantes 
+Se analizan los días de atención de los restaurantes. Se concluye que no aporta información relevante porque más del 99% tiene atención los 7 días de la semana, por lo que se decide eliminar la variable del análsis.
 
 ```{r Dias Atencion}
 # chefmozhours4_mod <- read.csv ("Dataset/chefmozhours4_modificado.csv", sep = ',')
@@ -277,7 +290,7 @@ Se analizan los días de atención de los restaurantes
 # names(chefmozhours4_mod1) <- c("placeID", "L-V", "S", "D")
 ```
 
-Otras de las variable a analizar es si tiene parking o no el restaurante. Cuando se carga los datos se identificaron 7 factores donde se distribuyen los datos. En ese caso se consideró crear una nueva variable logica donde se guarde TRUE cuando sean los valores(fee,public,valet parking,validated parking,yes) y FALSE cuando sea igual none o stree.
+Otras de las variable a analizar es si tiene parking o no el restaurante. Cuando se carga los datos se identificaron 7 factores donde se distribuyen los datos. En ese caso se consideró crear una nueva variable logica donde se guarde TRUE cuando sean los valores fee, public, valet parking, validated parking, yes y FALSE cuando sea igual none o street.
 ```{r ¿Tiene Parking?}
 #Levantar datos de parking y guardar
 chefmozparking <- read.csv ("Dataset/chefmozparking.csv", sep = ',')
@@ -285,7 +298,7 @@ chefmozparking <- read.csv ("Dataset/chefmozparking.csv", sep = ',')
 #Se identificaron los valores para el factor parking_lot
 levels(chefmozparking$parking_lot)
 
-#Cuando sea stree se convierte a none porque se considera que no se clasifica como que tiene parqueo.
+#Cuando sea street se convierte a none porque se considera que no se clasifica como que tiene parqueo.
 chefmozparking$parking_lot[chefmozparking$parking_lot == "street"] <- "none"
 
 #Se crea una nueva variable parking_lot
@@ -295,7 +308,7 @@ head(chefmozparking)
 str(chefmozparking)
 ```
 
-Se analizaron los medios de pagos en la base de clientes "userpayment.csv" para identficar los mas usados y así cargar los mas identificativos del negocio. Se generó una columna para cada medio de pago y se determino por restaurante TRUE O FALSE si tenia disponible este medio de pago.
+Se analizaron los medios de pagos en la base de clientes "userpayment.csv" para identficar los mas usados y así cargar los mas identificativos del negocio. Se generó una columna para cada medio de pago y se determinó por restaurante TRUE O FALSE si tenia disponible este medio de pago.
 
 ```{r Medios Pagos: Tipos}
 #Levantar datos de medios de pago aceptados y guardar
@@ -305,7 +318,7 @@ chefmozaccepts <- read.csv ("Dataset/chefmozaccepts.csv", sep = ',')
 chefmozaccepts$Rpayment <- toupper(chefmozaccepts$Rpayment)
 chefmozaccepts <- unique(chefmozaccepts)
 
-#Genero el mismo set de datos para genera posteriormente
+#Genero el mismo set de datos para utilizar posteriormente
 chefmozacceptsCant <- chefmozaccepts
 
  
@@ -319,8 +332,9 @@ chefmozacceptsCant <- chefmozaccepts
 # chefmozaccepts[,2:6] <- ifelse(is.na(chefmozaccepts[,2:6]) == T , F , T)
 # head(chefmozaccepts, 10)
 ```
-Despues de analizado los datos se identifica que los restaurantes tienen varias opciones de medios de pagos por tanto se considera relevante para el analisis la cantidad de opciones que tiene cada restaurante.
-Se consideró como una nueva variable la cantidad de medios de pagos que tiene cada restaurante.
+Después de analizado los datos se identifica que los restaurantes tienen varias opciones de medios de pagos por tanto se considera relevante para el analisis contar la cantidad de opciones que tiene cada restaurante.
+
+Se optó por agregar esta nueva variable y desestimar la apertura en un medio de pago como variable para evitar el aumento signiticativo de la cantidad de variables del dataset. 
 ```{r Medios Pagos: Cantidad}
 
 # Se calcula la cantidad medios de pagos por cada restaurante
@@ -347,20 +361,21 @@ names(ratings) <- c("placeID", "rating", "foodRating", "serviceRating")
 
 head(ratings)
 ```
+Se cargan las variables a analizar dentro de geoplaces:
 
 ```{r Otros atributos geoplaces}
 otherAttributes <- geoplaces[,c("placeID","area","franchise","Rambience","price","accessibility","dress_code","alcohol")]
 str(otherAttributes)
 
-#Se convierte a logica la variable "franchise" ya que sus valores son t y f
+#Se convierte a lógica la variable "franchise" ya que sus valores son t y f
 otherAttributes$franchise <- ifelse(toupper(otherAttributes$franchise) == "F",F,T)
 head(otherAttributes,10)
 ```
 ### Unión de todos los dataset
-Uniones entre las set de datos para generar la tabla principal de datos:
+Uniones entre las set de datos para generar la tabla principal de datos. Se toma los ID de los restaurantes presentes en geoplaces por ser los que poseen la información más relevante para el análisis:
 ```{r Union entre dataset}
 
-#uniendo Distancias geograficas con 
+
 allRestaurant <- left_join(x = dfDistance
                        ,y = smokingPlace
                        ,by = "placeID",
@@ -416,13 +431,14 @@ funModeling::df_status(allRestaurant)
 ```
 ### 3.1 Tratamiento a valores NAs, Ceros y tipos de datos
 
-Identificamos que los valores isSmoking y franchise, hasParking son valores logicos pero no tienen NA pero los demas si deben transformados. Decidimos comvertir las variables logcias con presencia ded Na en variables categoricas (Factor)  y se agregará una nueva clasificación "otros" donde se agrupen los valores faltantes.
-Todos los valores de Cantidad de comida (foodCount) con valores Na seran convertidos a -1
+Identificamos que los valores isSmoking y franchise, hasParking son valores logicos pero no tienen NA pero los demas si deben ser transformados. Decidimos comvertir las variables logcias con presencia de Na en variables categoricas (Factor)  y se agregará una nueva clasificación "otros" donde se agrupen los valores faltantes.
+Todos los valores de Cantidad de comida (foodCount) con valores Na seran convertidos a 10 buscando un valor alejado a los registros existentes.
 ```{r Na Ceros y Tpos datos}
-#Convertir los Na de las variables numericas de cantidad de comidas y medios de pagos ofrecidos en -1 
+#Convertir los Na de las variables numericas de cantidad de comidas y medios de pagos ofrecidos en 10 
 varsNumeric = c("foodCount", "payCount")
 allRestaurant = allRestaurant %>% mutate_at(.vars=varsNumeric, .funs = funs(ifelse(is.na(.), 10, .)))
 
+# se lo identifica como "SIN DATO" ya que existe un atributo "Otros" como residual en la agrupación por tipo de comida. 
 allRestaurant$TypeCuisine <- as.character(allRestaurant$TypeCuisine)
 allRestaurant[is.na(allRestaurant)] = "SIN DATO"
 
@@ -436,7 +452,7 @@ allRestaurant$franchise <- NULL
 #Se muestra el resuen del estatus de los datos
 funModeling::df_status(allRestaurant)
 ```
-Despues de la transformación que mantienen 130 observaciones con sus transformaciones aplicadas.
+Despues de la transformación se mantienen las 130 observaciones con sus transformaciones aplicadas.
 
 ```{r Matriz Correlacion}
 # calculamos la matriz de correlacion 
@@ -463,6 +479,7 @@ allRestaurant[is.na(allRestaurant)] <- 0
               hc.order = T)
 ```
 
+Se grafica la correlación entre las variables numéricas. Se observa alta correlación entre las variables de distancias entre sí y tambien entre las que refieren al rating,lo cual tiene sentido. 
 
 ```{r Correlacion entre variables Num}
 varNun <- which(sapply(allRestaurant,is.numeric))
@@ -493,9 +510,9 @@ cualitativas <- separacion$X.quali
 restMixPCA <- PCAmix(cuantitativas, cualitativas, rename.level = TRUE, graph = FALSE, ndim = 31)
  
 # Contribución a la varianza
-restMixPCA$eig # el 90% de la varianza se acumula en el componente 16
+restMixPCA$eig # el 90% de la varianza se acumula en el componente 18
 
-#Se corre nuevamente para 16 dimensiones que es donde se acumula más del 90% de la varianza
+#Se corre nuevamente para 18 dimensiones que es donde se acumula más del 90% de la varianza
 restMixPCA <- PCAmix(cuantitativas, cualitativas, rename.level = TRUE, graph = FALSE, ndim = 18)
 
 allRestScores <- data.frame(restMixPCA$scores.stand)
@@ -675,8 +692,7 @@ fviz_silhouette(sil.obj = clusHclustPCA, print.summary = TRUE, palette = "jco",
 ```
 
 ### 4.3 Poda del arbol y asociación de cluster al dataset
-A partir de los resultados de la silueta obtenidos para Diana y Hclust con y sin PCAMix concluimos que el mejor modelo es hclust sin PCAMix para K=4 obteniendo una silueta de 0.45
-
+A partir de los resultados de la silueta obtenidos para Diana y Hclust con y sin PCAMix concluimos que el mejor modelo es Diana sin PCAMix para K=4 obteniendo una silueta de 0.32.
 ```{r hclust: Cortar el arbol}
 groups <- as.factor(cutree(clustDianaDiv, k=4))
 summary(groups)
@@ -693,7 +709,9 @@ head(allRestaurant)
 
 ### 4.3	Caracterice y describa los resultados a los cuales se arribaron en el caso anterior, desde el punto de vista del negocio.
 
+Consideramos que por el resultado obtenido en el coeficiente de la silueta en base al K optimo resultante de la gráfica "elbow" no es lo suficientemente bueno. En la corrida anterior con los tipos de comidas abiertos como varibales obtuvimos un coeficiente de 0,45. Sin embargo a nivel de interpretación de resultados no vemos la utilidad de tener un cluster formado por registros con atributos "otros" cuando en realidad se trató de una correccion a los datos por la forma de exposición. 
 Se muestra gráficamente dentro del dendograma la distribución de los 4 clusters  
+
 
 ```{r Evaluación: Diana Dendograma}
 pltree(clustDianaDiv, hang=-1, cex = 0.6)
@@ -713,12 +731,30 @@ plot(allRestaurant$classCity,allRestaurant$cluster)
 # library(Lock5Data)
 # plot(Happiness,LifeExpectancy,pch=19,col="red")
 ```
+De la gráfica se concluye que los datos quedaron fuertemente clusterizados por la ciudad. Dentro de la ciudad A por el volumen de datos en relación a las dos restantes se formaron dos clusters. 
+Acontinuacion se analizan los resutaltados de los clusters dentro de la ciudad A donde se visualiza la distribución de frecuencia de los distintos tipos de comida, observando que hubo cierta incidencia de esta variable en el modelo. Los "sin dato" que tienen una participación importante dentro de la distribución quedaron fuertemente concentrados en el cluster 3.
+El outlier identificado en la posicion 129 pertenece a la ciudad B y quedó en el cluster 1 como el resto de los registros de esa ciudad
+
+
+```{r}
+
+
+cuidad_A = subset(allRestaurant,classCity == "A") 
+cuisine_freq_A = freq(cuidad_A, "TypeCuisine")
+cuidad_A_C2 = subset(cuidad_A,cluster== 2) 
+cuisine_freq_A_C2 = freq(cuidad_A_C2, "TypeCuisine")
+cuidad_A_C3 = subset(cuidad_A,cluster== 3) 
+cuisine_freq_A_C2 = freq(cuidad_A_C3, "TypeCuisine")
+
+
+```
+
 
 
 
 Se exportan los datos del resultado en un archivo csv para ser cargado a la base de datos del sistema que gestiona la pagina web. 
 ```{r}
-write.csv(allRestaurant,file="allRestaurantCSV.csv")
+write.csv(allRestaurant,file="allRestaurantCSV.csv", row.names = FALSE)
 ```
 
 ### 5. Implementación
