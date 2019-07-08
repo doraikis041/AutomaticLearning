@@ -1,95 +1,140 @@
 ---
-title: "ETL"
-author: "Leticia Suarez (202006) - Doris Medina (241578)"
+title: "Obligatorio de Taller de Aprendizaje Automático"
+author: "Leticia Suarez (202006) y Doris Medina (241578)"
 date: "13 de junio de 2019"
 output: html_document
 ---
-# 1. - Entendimiento del caso de negocio y planificación del trabajo
-## 1.1 - Planteo del problema
+```{r Inicio, message=FALSE, warning=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## 1. Entendimiento del caso de negocio y planificación del trabajo
+
+**Planteo del problema**  
 Rest-on es una guía turística que está armando en su web una sección de restoranes, que sirva para asesorar a sus clientes en las características y calidad de los restoranes. A estos efectos, los contratan a ustedes para apoyarlos en los algoritmos de soporte de su web, con dos objetivos: 
-i.	Poder recomendarles a sus clientes restoranes similares a los que han consultado
-ii.	Rankear a los restoranes, en términos relativos a los restoranes comparables. 
+* Poder recomendarles a sus clientes restoranes similares a los que han consultado
+* Rankear a los restoranes, en términos relativos a los restoranes comparables. 
 A estos efectos, cuenta con una base de datos de restoranes, a la cual se puede acceder en el siguiente link: https://archive.ics.uci.edu/ml/datasets/Restaurant+%26+consumer+data
 
-*2	*Entendimiento del caso de negocio y planificación del trabajo
-*Discuta el desafío planteado en términos de la importancia que tiene para una empresa cualquiera y para Rest-on en particular
+### 1.1 Discuta el desafío planteado en términos de la importancia que tiene para una empresa cualquiera y para Rest-on en particular
+Ofrecer recomendaciones que generan valor para los clientes es un objetivo para Rest-ON. No es solo recomendar una opción al cliente, sino que esta desarrolle una conexión con la marca y los clientes vean en la empresa un asesoramiento fundamentado.  Por tanto, es objetivo realizar un este análisis permitiendo que los clientes no solo encuentren lo que están buscando, sino que se identifiquen con el servicio. 
+Este desafió está presente en todas aquellas empresas en su valor de negocio esté vinculado con la fidelidad de los clientes que trabajan con la marca.  
 
-Dar buenas recomendaciones porque es su valor de negocio para otra industria no tiene porque serlo porque tienen otra de oferta de valor. Ejemplo:
+### 1.2	Identifique conceptual y técnicamente qué tipo de modelos serían necesarios para atender este problema  
+Para ofrecer una información que genere valor para el cliente se deben clasificar correctamente los restaurantes a partir de las características que estos poseen y los servicios que ofrece, también se puede tener en cuenta las características propias de los usuarios que visitan los restaurantes que permita realizar una segmentación en función de las características de los usuarios. 
+Todo dependerá del análisis del negocio detallando donde se identifique las variables que pueden formar parte de la segmentación de los restaurantes y poder ofrecer una calidad del servicio superior a los turistas que vienen a recibir la experiencia de Rest-ON.
 
-*Identifique conceptual y técnicamente qué tipo de modelos serían necesarios para atender este problema (no el algoritmo específico, sino el tipo de técnica). 
-
-*Plantee hipótesis respecto a qué dimensiones de análisis (a nivel conceptual y macro) y variables pueden ser relevantes para lograr el objetivo.
+### 1.3	Plantee hipótesis respecto a qué dimensiones de análisis y variables pueden ser relevantes para lograr el objetivo
 
 Analizando el modelo de negocio de la empresa planteamos como hipótesis que:
-Para ofrecer mejores recomendaciones es necesario conocer las características de los restaurantes, entender que tipos de cliente asisten y establecer las peculiaridades de la comida.
-3.1	Dimensiones propuestas:
-•	Datos del cliente
-•	Características de los restaurantes
-•	Características de la comida
+Para ofrecer mejores recomendaciones es necesario conocer las características de los restaurantes, entender que tipos de cliente asisten y establecer las peculiaridades de la comida que ofrecen  
 
-Como variables dentro de cada dimensión identificamos las siguientes:
-•	Datos del cliente – deberíamos conocer el perfil y las costumbres de los clientes que concurren al restaurante, que nos permita clasificar los restaurantes partiendo de las características de los clientes que concurren y en qué modo lo hacen, ej, si es con familia, o amigos, si prefieren un ambiente más relajado, etc. 
-•	Características de la comida – esta dimensión abarca las particularidades de la comida respecto al tipo de menú, la forma en que se sirve, restricciones alimenticias, entre otros.
-•	Características de los restaurantes – aquí se recoge la tipología del restaurante, en relación a aspectos operativos y físicos, tales como  ubicación, disponibilidad de estacionamiento, medios de pagos aceptados, y otras cualidades que lo hagan atractivo.
+**Dimensiones propuestas:**  
+* Características de los restaurantes  
+* Características de la comida  
+* Datos de los clientes que concurren  
 
-* Identifique, en base a lo anterior, qué tipo de datos precisaría obtener para llevar a cabo este trabajo
+**Como variables dentro de cada dimensión identificamos las siguientes:**  
+* Características de la comida: Esta dimensión abarca las particularidades de la comida respecto al tipo de menú, la forma en que se sirve, restricciones alimenticias, entre otros.  
+* Características de los restaurantes – aquí se recoge la tipología del restaurante, en relación a aspectos operativos y físicos, tales como ubicación, disponibilidad de estacionamiento, medios de pagos aceptados, y otras cualidades que lo hagan atractivo.  
+* Datos del cliente: Deberíamos conocer el perfil y las costumbres de los clientes que concurren al restaurante, que nos permita clasificarlos teniendo en cuenta características de los clientes que concurren y en qué modo lo hacen.  
+*Ejemplo: Si es con familia, o amigos, si prefieren un ambiente relajado, etc*
 
-<<Agregar la primer tabla>>
+### 1.4 Identifique, en base a lo anterior, qué tipo de datos precisaría obtener para llevar a cabo este trabajo
 
-5. Arme un plan de trabajo, identificando las diferentes etapas y actividades para lograr el objetivo. 
+> Ver anexo *Datos Complementarios.xlsx* la pestaña **Varibles Propuestas**
+
+### 1.5	Arme un plan de trabajo, identificando las diferentes etapas y actividades para lograr el objetivo 
+
+Se propone para el desarrollo de esta investigación utilizar la metodología CRISP–DM que abarca desde el entendimiento del negocio hasta el despliegue de la solución sin dejar de lado las tareas de gestión de proyectos que permiten el monitoreo y control del tiempo, costos y riesgos asociados.  
+De acuerdo con la metodología CRISP-DM se proponen las siguientes fases:   
+
+1. Comprensión del negocio  
+2. Comprensión de los datos  
+3. Preparación de los datos  
+4. Modelado  
+5. Evaluación  
+6. Implementación  
+
+**Comprensión del negocio:** El plan para esta fase consta de comprender el negocio y  los objetivos comerciales de la empresa. Adicionalmente abarcaremos tareas tales como describir el problema que se desea resolver, la naturaleza del negocio y el aporte que se desea obtener con el trabajo. 
+Comprensión de los datos: Se realizará un análisis de todos los dataset, revisando las variables y cantidad de registros de cada uno de ellos, presencia de N/A, estructura de los datos, errores en los mismos y utilidad que aporta cada una de las variables para el objetivo del trabajo. 
+
+**Preparación de los datos: **En función de los resultados obtenidos en la fase anterior trabajaremos en la transformación de los datos para obtener las variables en el formato adecuado, crear nuevas a partir de la transformación de las ya existentes, y corrección mediante alguna metodología de los registros con NA. 
+
+**Modelado:** En esta etapa se evaluarán los modelos a utilizar para realizar el análisis de cluster de los restaurantes. Por la naturaleza del problema se tratará de un modelo no supervisado. Evaluaremos modelos aglomerativos y divisivos.
+Evaluación: Se utilizarán técnicas como silueta y elbow para ajustar los modelos y verificar los resultados. 
+
+**Implementación: **Por último se pondrá el modelo a disposición para ser utilizado evaluando la forma más eficiente de hacerlo.  
+Si bien todas las etapas comentadas anteriormente se hacen en forma secuencial, el modelo prevé la posibilidad de regresar a una fase anterior para revisarla y retomar nuevamente el proceso.  
+
+**Gestión de proyecto**   
+Para la implementación del proyecto se realizara entre el equipo un control de toda la versión del proyecto y se genera un repositorio para el seguimiento y control de código. Utilizando buenas prácticas reduce la posible generación de errores en los controles de cambio.  
+
+![](Exercise/Fases Metodologia.png)
+
+
 Para el desarrollo de este trabajo se propone utilizar la metodología CRISP–DM.
 Dicha metodología abarca desde el entendimiento del negocio hasta el despliegue de la solución sin dejar de lado las tareas de gestión de proyectos que permiten el monitoreo de la evolución del proyecto controlando tiempos, costos y riesgos asociados.
 
   Gestion de proyecto:
   Para la implementacion del proyecto se realizara entre el equipo un control de toda la version del proyecto y se genera un repositorio para el segimiento y control de codigo. Utilizando buenas practias reduce la posible generacion de errores en los controloes de cambio.
 
-6. ¿Cómo será utilizado el resultado del trabajo por el cliente? 
-El resultado o solución va a ser utilizado por la agencia turística para incluirlo en su motor de búsqueda y ofrecer un servicio que beneficie a sus usuarios, generando más volumen de visitas a su sitio y fidelizándolos.  
-Los restaurantes en la medida que este motor de búsqueda y recomendaciones tenga mayor difusión se beneficiaran por tener mayor publicidad y el perfil de clientes que se sienta más cómodo respecto  la propuesta que ofrece.
+### 1.6	¿Cómo será utilizado el resultado del trabajo por el cliente? 
+El resultado o solución va a ser utilizado por la agencia turística para incluirlo en su motor de búsqueda y ofrecer un servicio que beneficie a sus usuarios, generando más volumen de visitas a su sitio y fidelizándolos. También será usado por los asesores de la empresa utilizarán el sitio para ofrecer a los vacacionistas mejores recomendaciones según sus necesidades y las características de los restaurantes.  
+Los restaurantes en la medida que este motor de búsqueda y recomendaciones tenga mayor difusión se beneficiaran por tener mayor publicidad y el perfil de clientes que se sienta más cómodo respecto la propuesta que ofrece.  
 El usuario en la medida que el motor de búsqueda sea reconocido y fiable en cuanto a las recomendaciones podrá disfrutar de opciones más adecuadas a sus preferencias.   
+ 
+### 1.7	En base a lo anterior, ¿Qué áreas se deberían involucrar en el proyecto y qué rol cumplirían?
+Para la ejecución exitosa del proyecto tendría que participar todas las áreas que estarán en el ciclo completo del proyecto, desde la definición hasta su puesta en producción y mantenimiento del proyecto. En tres las áreas identificadas están comercial, marketing y el área de soporte técnico que son quienes más conocen a los usuarios de la guía. Por otro lado el área de operaciones y IT al conocer como manejar la gestión de la empresa realizarán la captura de datos y recopilación de datos de los diferentes restaurantes. Finalmente, el área financiera deberá verificar los impactos económicos de las iniciativas y el equipo de Analistas de Datos para interactuar con los restantes interlocutores.
 
-7. En base a lo anterior, ¿Qué áreas se deberían involucrar en el proyecto y qué rol cumplirían?
-Tendría que participar el área comercial / marketing y el área de soporte técnico que son quienes más conocen a los usuarios de la guía, el área de operaciones/IT porque maneja la gestión de la empresa y va a tener que obtener la información de los diferentes restaurantes, finanzas para verificar los impactos económicos de las iniciativas y el equipo de Analistas de Datos para interactuar con los restantes interlocutores.
+## 2. Extracción, Transformación o Carga de datos
+### 2.1	Diseñe la estructura de tabla datos analítica: ¿qué va a ser cada fila? cuáles van a ser las columnas.  
 
-# 2. Extracción, Transformación o Carga de datos
-**Diseñe la estructura de tabla datos analítica: ¿qué va a ser cada fila? cuáles van a ser las columnas
-**¿Cómo se construye cada una de las variables en la tabla datos? De que table surge y que transformaciones de datos son necnesarias
-**Construya la tabla de datos analíticas en base a especificación anterior.
+La tabla analítica resultante de esta etapa contará de ID de restaurantes en las filas y variables en las columnas.
 
-<<Agregar la segunda tabla con perfilado de datos>>
+> Ver anexo *Datos complementarios.xlsx* la pestaña **Tabla**
 
-Se realiza el proceso de ETL de las fuentes de datos
+### 2.2	¿Cómo se construye cada una de las variables en la tabla de datos? ¿De qué tablas surge y qué transformaciones de datos son necesarias?
+En el archivo adjunto “Datos complementarios.xlsx” se especifican las características de las variables seleccionadas, cuál será la fuente de información y que transformación se le hará a cada una.  
 
-## 2.1 Preparación del entrono de trabajo
-```{r Inicio, message=FALSE, warning=FALSE, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
-knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+> Ver anexo *Datos complementarios.xlsx* la pestaña **Tabla**
 
-#Se cargan las librerías utilizadas para el proceso
+### 2.3	Construya la tabla de datos analíticas en base a la especificación anterior
+
+Finalmente se ensamblan todas las variable en la tabla analítica a partir de los ID de restaurantes de la tabla de geoplaces. Esto es debido a que a pesar de que tiene notoriamente menos registros que los restantes dataset, contiene información muy relevante al momento de realizar el cluster, por lo que decidimos reducir la cantidad de restaurantes en pos de enriquecer el análisis.  
+Se trabaja en la corrección de los registros con NA en las variables donde están presentes definiéndolos con un valor diferente a los existentes de forma de tenerlos identificados. 
+A modo aclaratorio comentamos que los dataset de los usuarios no fueron utilizados ya que no están identificados como usuarios de los restaurantes por lo que no aportan información relevante para el perfil de clientes y adicionalmente no agregan información que ya no este contenida en los datasets de los restaurantes.
+
+A continuación se detalla todo el proceso de ETL realizado para cada una de las variables.
+
+**Preparación del entrono de trabajo**  
+Se cargan todas 
+```{r Librerias, message=FALSE, warning=FALSE, include=FALSE}
 library(plyr) # OK
 library(dplyr) # OK
 library(Hmisc) # OK
 library(cluster) # OK
-library(tidyverse)
-library(modelr)
+# library(tidyverse)
+# library(modelr)
 library(funModeling) #OK
 library(ggplot2)
 library(ggcorrplot) # OK
-library(MASS)
-library(GGally)
-library(simstudy)
-library(foreign)
-library(feather)
-library(data.table)
-library(jtools)
-library(purrr)
+# library(MASS)
+# library(GGally)
+# library(simstudy)
+# library(foreign)
+# library(feather)
+# library(data.table)
+# library(jtools)
+# library(purrr)
 library(tidyr) # OK
-library(XML)
-library(xml2)
-library(jsonlite)
-library(rjson)
-library(stringi)
-library(here)
+# library(XML)
+# library(xml2)
+# library(jsonlite)
+# library(rjson)
+# library(stringi)
+# library(here)
 library(PCAmixdata) #OK
 library(psych) # OK
 library(factoextra)
@@ -105,9 +150,7 @@ source("Utility/tablaresumen.R")
 set.seed(123)
 ```
 
-
-
-### 2.1 - Transformación de datos de ubicación
+#### 2.1 - Transformación de datos de ubicación
 Para analizar las distancias gegraficas de los restaurantes se analiza la fuente de datos geoplaces2.csv que tiene un 21 variables para analizar. A continuación se muestran las carateristicas de las vaiables, tipos de datos y framento de valores a partir de la función *srt*
 
 ```{r Ubicación: geoplaces2.csv }
@@ -177,7 +220,7 @@ str(chefmozcuisine)
 head(chefmozcuisine)
 ```
 Se realiza una reclasifacion utilizando pareto para reducir la cantidad de factores.
-```{r Distribución de frecuencia}
+```{r Tpo comida: Distribución de frecuencia}
 head(freq(chefmozcuisine, "Rcuisine"), 20)
 
 cuisine_freq = freq(chefmozcuisine, "Rcuisine", plot = F)
@@ -189,7 +232,7 @@ freq(chefmozcuisineFrc, 'Rcuisine')
 ```
 Un corte razonable sería a partir del 80% de los datos, pero esto implicaria quedarnos con 17 variables (las transformaremos en variables debido a que los restaurantes en general aplican a mas de un tipo de comida por lo que tienen más de una fila para cada ID). Por otra parte observamos que existen varios tipos de comidas similares entre ellos, por lo que decidimos agruparlos generando una reclasificación para quedarnos con menos variables.
 
-```{r Grupo Comida}
+```{r Tpo Comida: Tipos}
 #Grupos de comidas
 chefmozcuisineAgg <- read.csv ("Dataset/Cuisine_agrupado.csv", sep = ';')
 
@@ -200,15 +243,10 @@ chefmozcuisineClass <- left_join(chefmozcuisine,chefmozcuisineAgg, by="Rcuisine"
 # adicionalmente se elimina la columna con la clasificacion anterior y todas las filas que quedaron
 # con igual clasificacion para el mismo ID
 chefmozcuisineClass <- unique(chefmozcuisineClass[,-2])
-
-#Normalizo la tabla
-chefmozcuisineClass <- tidyr::spread(data = chefmozcuisineClass, key = Cuisine_agrupada, value = Cuisine_agrupada)
-str(chefmozcuisineClass)
-
-chefmozcuisineClass[,-1] <- ifelse(is.na(chefmozcuisineClass[,-1]) == T , F , T)
+chefmozcuisineClass <- chefmozcuisineClass[!duplicated(chefmozcuisineClass[,c("placeID")]),]
 
 head(chefmozcuisineClass, 10)
-
+str(chefmozcuisineClass)
 ```
 A partir de analisis anterior consideramos que aporta información de negocio determinar la cantidad de tipos de comida que ofrecen los restaurantes partiendo de la base que a mayor cantidad de ofertas permite un publico mas variado
 ```{r CREATE Tpo Comida: Cantidad Comida}
@@ -269,7 +307,8 @@ chefmozaccepts <- unique(chefmozaccepts)
 
 #Genero el mismo set de datos para genera posteriormente
 chefmozacceptsCant <- chefmozaccepts
-# 
+
+ 
 # # Se normaliza todos los valores de medio de pago
 # chefmozaccepts <- tidyr::spread(data = chefmozaccepts, key = Rpayment, value = Rpayment)
 # print(colnames(chefmozaccepts))
@@ -359,7 +398,18 @@ allRestaurant <- left_join(x = allRestaurant
 str(allRestaurant)
 head(allRestaurant,20)
 ```
-## 3. Exploración y analisis descriptivo
+## 3.	Exploración y análisis descriptivo  
+### 3.1	Realice un análisis descriptivo de la tabla de datos.
+Se obtiene la tabla con las variables ya definidas y los datos corregidos habiendo chequeado la existencia de ceros y NA.    
+### 3.2	¿Descarta a priori alguna variable a partir de este análisis?
+Respecto al medio de pago decidimos reducir la cantidad de variables y quedarnos solo con la variable de cantidad.  Anteriormente también habíamos descartado la variable relativa a la disponibilidad de internet ya que si bien es relevante había muy pocos restaurantes que contaban con este registro de información. 
+### 3.3	¿Puede sospechar qué variables serán útiles para el problema identificado?
+Entendemos que variables relativas a la ubicación, tipos de comidas y precio serán importantes para el análisis. 
+### 3.4	¿Es necesario tomar alguna decisión respecto al universo o a la exclusión de valores atípicos?
+
+Para las variables categóricas no existen datos atípicos ya que la única que presentaba observaciones de este tipo era la de tipos de comida y la reclasificamos reduciendo el número de niveles. 
+Para las variables numéricas analizamos los outliers a partir de la distancia de Mahalanobis, y los monitorearemos una vez que tengamos los resultados de la clusterización. 
+
 
 ```{r Analisis de NA,Ceros,INF..}
 funModeling::df_status(allRestaurant)
@@ -374,7 +424,7 @@ varsNumeric = c("foodCount", "payCount")
 allRestaurant = allRestaurant %>% mutate_at(.vars=varsNumeric, .funs = funs(ifelse(is.na(.), -1, .)))
 
 #Todas las variables con Na de los datos restantes de agruparan en la categoria Otros
-allRestaurant[is.na(allRestaurant)] ="OTROS"
+allRestaurant$Cuisine_agrupada <- ifelse(is.na(allRestaurant$Cuisine_agrupada)==T,"SIN DATOS",allRestaurant$Cuisine_agrupada)
 
 #Dtermino las variables definidas como caracter y las convierto a factor
 varLog <- unlist(lapply(allRestaurant, is.character))
@@ -468,16 +518,29 @@ dfGowerDistPCA <- daisy(allRestScores, metric = "gower")
 hist(dfGowerDistPCA, xlim = range(0.0,1.0), main = "Histograma de distancia de Gower - PCAMix")
 ```
 
-# Fase 4: Modelado y Evaluación
 
-## 4.1 - Modelo: Diana
+## 4. Modelado y Evaluación
+5.1	¿Qué variables pre-seleccionaría en base al análisis funcional y estadístico?
+Una vez realizado el análisis anterior en relación a la transformación, eliminación y creación de nuevas variables decidimos quedarnos con todas las que se encuentran en la nueva tabla de datos
 
-```{r Modelado: Divisivo - Diana}
+```{r}
+str(allRestaurant)
+```
+
+### 4.2	Estime al menos dos modelos (usando diferentes algoritmos y/o variables), compárelos (en base a criterios estadísticos y funcionales) y seleccione el que entienda más adecuado.  
+Utilizaremos los algoritmos de hclust como clustering aglomerativo y diana como clustering divisivo. 
+Para calcular las distancias de Gower utilizamos Daisy ya que tenemos variables mixtas dentro de la tabla de datos.
+Adicionalmente utilizaremos PCAmixed para calcular las mismas utilizando como dimensión la cantidad de componentes principales que acumulan el 90% de la varianza.
+
+#### 4.2.1 Modelo - Diana
+
+```{r Modelado: Diana}
 clustDianaDiv <- diana(as.matrix(dfGowerDist),diss = TRUE, keep.diss = TRUE)
 plot(clustDianaDiv, main = "Divisive")
 ```
 
-### 4.1.1 Análisis del Elbow
+**Análisis del Elbow**
+
 ```{r Evaluación: Diana - Elbow }
 ggplot(data = data.frame(t(cstats.table(dfGowerDist, clustDianaDiv, 15))), 
   aes(x=cluster.number, y=within.cluster.ss)) + 
@@ -488,24 +551,30 @@ ggplot(data = data.frame(t(cstats.table(dfGowerDist, clustDianaDiv, 15))),
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 4.1.2 Análisis de la Silueta
+**Análisis de la Silueta**  
+
+En función de los resultados obtenidos en el codo anterior se determina K optimo igual 5
 ```{r Evaluación: Diana - Silueta }
-clusDiana <- eclust(x = dfGowerDist, FUNcluster = "diana", k = 6, seed = 123,
+clusDiana <- eclust(x = dfGowerDist, FUNcluster = "diana", k = 5, seed = 123,
                       hc_metric = "euclidean", nstart = 50, graph = FALSE)
 fviz_silhouette(sil.obj = clusDiana, print.summary = TRUE, palette = "jco",
                 ggtheme = theme_classic())
 ```
+Se muestra gráficamente dentro del dendograma la distribución de los 5 clusters  
+```{r Evaluación: Diana Dendograma}
+pltree(clustDianaDiv, hang=-1, cex = 0.6)
+rect.hclust(clustDianaDiv, k = 5, border = 2:10)
+```
 
+#### 4.2.2 Modelo: Diana con PCAMix
 
-## 4.2 - Modelo: Diana con PCAMix
-
-```{r Modelado: Divisivo - Diana (PCAMix)}
+```{r Modelado: Diana (PCAMix)}
 clustDianaPCAmix <- diana(as.matrix(dfGowerDistPCA),diss = TRUE, keep.diss = TRUE)
 plot(clustDianaPCAmix, main = "Divisive")
 ```
 
 
-### 4.2.1 Análisis del Elbow
+**Análisis del Elbow**
 ```{r Evaluación: Diana - Elbow (PCAMinx) }
 ggplot(data = data.frame(t(cstats.table(dfGowerDistPCA, clustDianaPCAmix, 15))), 
   aes(x=cluster.number, y=within.cluster.ss)) + 
@@ -516,23 +585,22 @@ ggplot(data = data.frame(t(cstats.table(dfGowerDistPCA, clustDianaPCAmix, 15))),
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 4.2.2 Análisis de la Silueta
+**Análisis de la Silueta**
+En función de los resultados obtenidos en el codo anterior se determina K optimo igual 5
 ```{r Evaluación: Diana - Silueta (PCAMinx) }
-clusDianaPCA <- eclust(x = dfGowerDistPCA, FUNcluster = "diana", k = 6, seed = 123,
+clusDianaPCA <- eclust(x = dfGowerDistPCA, FUNcluster = "diana", k = 5, seed = 123,
                       hc_metric = "euclidean", nstart = 50, graph = FALSE)
 fviz_silhouette(sil.obj = clusDianaPCA, print.summary = TRUE, palette = "jco",
                 ggtheme = theme_classic())
 
 ```
 
-
-
-## 4.2 - Modelo: HCLUST
+#### 4.2.3 - Modelo: HCLUST
 Modelo aglomerativo HCLUST
 
-### 4.2.1 HCLUST: Definición del método
+**HCLUST: Definición del método**
 Realizaremos una corrida para cada metodo de hclust para identificar cual es el que tiene mayor numero de correlacion según los metodos posibles.
-```{r Metodo Aglomerativo: Difinición del metodo}
+```{r Metodo HCLUST: Difinición del metodo}
 # Metodo hclust (Hierarchical Agglomerative Clustering)
 H1=hclust(dfGowerDist,method='average')
 H2=hclust(dfGowerDist,method='complete')
@@ -554,17 +622,14 @@ print(paste("method: single =",cor(dfGowerDist,C4)))
 ```
 El metodo que con mayor cohefiente de correlacion fue el "average" con un 0.81 por tanto utilizaremos este metodo para el modelado.
 
-### 4.2.2 Modelo: hclust
+**Modelo: hclust**
 A partir del metodo definido en el epigrafe anterior se realiza la corrida del modelo
-```{r Metodo Aglomerativo: hclust}
+```{r Metodo: hclust}
 clustHclustAggl <- hclust(dfGowerDist, method = "average")
 
-plot(clustHclustAggl, main = "Agglomerative, complete linkages")
+plot(clustHclustAggl, main = "Aglomerativo, Método average")
 ```
-
-## 4.2.3 - Evaluación
-
-### 4.2.3.1 - Análisis del Elbow
+**Análisis del Elbow**
 ```{r Evaluación: hclust - Elbow}
 ggplot(data = data.frame(t(cstats.table(dfGowerDist, clustHclustAggl, 15))), 
   aes(x=cluster.number, y=within.cluster.ss)) + 
@@ -575,9 +640,10 @@ ggplot(data = data.frame(t(cstats.table(dfGowerDist, clustHclustAggl, 15))),
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 4.2.3.2 - Análisis de la Silueta
+**Análisis de la Silueta**
+En función de los resultados obtenidos en el codo anterior se determina K optimo igual 4
 ```{r Evaluación: hclust - Silueta}
-clusHclust <- eclust(x = dfGowerDist, FUNcluster = "hclust", k = 6, seed = 123,
+clusHclust <- eclust(x = dfGowerDist, FUNcluster = "hclust", k = 4, seed = 123,
                       hc_metric = "euclidean", nstart = 50, graph = FALSE)
 fviz_silhouette(sil.obj = clusHclust, print.summary = TRUE, palette = "jco",
                 ggtheme = theme_classic())
@@ -585,17 +651,15 @@ fviz_silhouette(sil.obj = clusHclust, print.summary = TRUE, palette = "jco",
 
 
 
-### 4.2.2 Modelo: hclust (PCAMix)
+#### 4.2.4 Modelo: hclust (PCAMix)
 A partir del metodo definido en el epígrafe anterior se realiza la corrida del modelo utilizando PCAMix
 ```{r Metodo Aglomerativo: hclust(PCAMix)}
 clustHclustAgglPCA <- hclust(dfGowerDistPCA, method = "average")
 
-plot(clustHclustAgglPCA, main = "Agglomerative, complete linkages")
+plot(clustHclustAgglPCA, main = "Aglomerativo, Metodo Average")
 ```
 
-## 4.2.3 - Evaluación
-
-### 4.2.3.1 - Análisis del Elbow
+**Análisis del Elbow**
 ```{r Evaluación: hclust - Elbow(PCAMix)}
 ggplot(data = data.frame(t(cstats.table(dfGowerDistPCA, clustHclustAgglPCA, 15))), 
   aes(x=cluster.number, y=within.cluster.ss)) + 
@@ -606,7 +670,8 @@ ggplot(data = data.frame(t(cstats.table(dfGowerDistPCA, clustHclustAgglPCA, 15))
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-### 4.2.3.2 - Análisis de la Silueta
+**Análisis de la Silueta**
+En función de los resultados obtenidos en el codo anterior se determina K optimo igual 6
 ```{r Evaluación: hclust - Silueta (PCAMix)}
 clusHclustPCA <- eclust(x = dfGowerDistPCA, FUNcluster = "hclust", k = 6, seed = 123,
                       hc_metric = "euclidean", nstart = 50, graph = FALSE)
@@ -614,18 +679,47 @@ fviz_silhouette(sil.obj = clusHclustPCA, print.summary = TRUE, palette = "jco",
                 ggtheme = theme_classic())
 ```
 
+### 4.3 Poda del arbol y asociación de cluster al dataset
+A partir de los resultados de la silueta obtenidos para Diana y Hclust con y sin PCAMix concluimos que el mejor modelo es hclust sin PCAMix para K=4 obteniendo una silueta de 0.45
 
-
-### 4.2.3.3 - Poda del arbol
 ```{r hclust: Cortar el arbol}
-groupsHclust <- as.factor(cutree(clustHclustAggl, k=5))
+groupsHclust <- as.factor(cutree(clustHclustAggl, k=4))
 summary(groupsHclust)
 ```
-## 4.2.3 - Almacenar los datos
+Se le agregara al dataset los nombres de los restaurantes
+```{r Nombre: Restaurantes}
+allRestaurant$clusterHclust <- groupsHclust
 
-```{r}
-# allRestaurant$clusterDiana <- groupsDiana
-# allRestaurant$clusterHclust <- groupsHclust
-# head(allRestaurant)
+restName <- geoplaces[,c("placeID","name")]
+allRestaurant <- left_join(x = allRestaurant,y = restName,by = "placeID",all = TRUE)
+head(allRestaurant)
 ```
 
+
+```{r Grafico Cluster Var numericas}
+fviz_cluster(list(data = allRestNum, cluster = groupsHclust))
+```
+
+### 4.3	Caracterice y describa los resultados a los cuales se arribaron en el caso anterior, desde el punto de vista del negocio.
+
+Se exportan los datos del resultado en un archivo csv para ser cargado a la base de datos del sistema que gestiona la pagina web. 
+```{r}
+write.csv(allRestaurant,file="allRestaurantCSV.csv")
+```
+
+### 5. Implementación
+
+#### 5.1	¿Cómo entiende que el modelo podría ser utilizado por la web para cumplir el objetivo funcional?
+En función de lo transmitido en el requerimiento el usuario debería ingresar el nombre de un restaurante y el sitio web le devolvería los restaurantes similares en función del análisis de clusters realizado 
+
+#### 5.2	En base a lo anterior, ¿cómo debería ser la implementación de este modelo (estimación resultados en tiempo real, procesamiento batch, etc)?
+Dentro de los tipos de implementación vistos en clase este modelo se podría clasificar como un análisis puntual que no precisa ser corrido con frecuencia. De todas formas sería importante cada cierto tiempo ir enriqueciendo las bases con información de los restaurantes y más aún cuando debimos trabajar solo con 130 registros por no contar con información relevante para los restantes.
+
+#### 5.3	¿Cómo se podrían armar, usando los resultados de este modelo, los rankings de restoranes “en términos relativos” o “específicos a un grupo”? Si bien no es necesario realizar los desarrollos, identifique el proceso, actividades, variables a utilizar, etc y describa con el mayor detalle posible.
+Los resultados del modelo se deberían mostrar en la web al ingresar el nombre de un restaurante por parte del usuario devolviendo todos los registros correspondientes a ese cluster. Entendemos que el cliente nos debería especificar el criterio para mostrar los restaurantes correspondientes a ese cluster pero sugerimos hacerlo por distancia de gower comenzado por la que tenga una menor, considerando que una menor distancia implica mayor similitud entre los mismos. 
+Otro criterio de ordenamiento podría ser la ubicación geográfica, el tipo de comida recomendando en primer lugar los que ofrecen la misma comida que ingresó el usuario o por rating del restaurante.  
+
+#### 5.4 ¿Qué ventaja tendría esto frente a usar un ranking general?
+En el caso de la distancia de gower por ejemplo, la ventaja es que si no conocemos específicamente el atributo que según el usuario hace que un restaurante sea similar a otro, este parámetro contempla todas las variables mejorando la probabilidad de devolver uno similar considerando todas las variables contenidas en el dataset. 
+#### 5.5	¿Cómo se podría evaluar el resultado (éxito) del trabajo?
+Más allá de los métodos estadísticos como la silueta que se muestra en el desarrollo del trabajo, a nivel de negocio sería importante conocer la opinión del usuario luego de haber concurrido al restaurante recomendado de forma de conocer el grado de satisfacción de la recomendación.
