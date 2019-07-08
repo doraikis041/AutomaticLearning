@@ -235,7 +235,7 @@ Un corte razonable sería a partir del 80% de los datos, pero esto implicaria qu
 ```{r Tpo Comida: Tipos}
 #Grupos de comidas
 chefmozcuisineAgg <- read.csv ("Dataset/Cuisine_agrupado.csv", sep = ';')
-
+names(chefmozcuisineAgg)[2] <- "TypeCuisine"
 # a continuacion se unen ambas tablas conservando todas las filas del dataset original y agregando
 # la columna con la nueva clasificacion.
 chefmozcuisineClass <- left_join(chefmozcuisine,chefmozcuisineAgg, by="Rcuisine")
@@ -421,10 +421,10 @@ Todos los valores de Cantidad de comida (foodCount) con valores Na seran convert
 ```{r Na Ceros y Tpos datos}
 #Convertir los Na de las variables numericas de cantidad de comidas y medios de pagos ofrecidos en -1 
 varsNumeric = c("foodCount", "payCount")
-allRestaurant = allRestaurant %>% mutate_at(.vars=varsNumeric, .funs = funs(ifelse(is.na(.), -1, .)))
+allRestaurant = allRestaurant %>% mutate_at(.vars=varsNumeric, .funs = funs(ifelse(is.na(.), 10, .)))
 
-#Todas las variables con Na de los datos restantes de agruparan en la categoria Otros
-allRestaurant$Cuisine_agrupada <- ifelse(is.na(allRestaurant$Cuisine_agrupada)==T,"SIN DATOS",allRestaurant$Cuisine_agrupada)
+allRestaurant$TypeCuisine <- as.character(allRestaurant$TypeCuisine)
+allRestaurant[is.na(allRestaurant)] = "SIN DATO"
 
 #Dtermino las variables definidas como caracter y las convierto a factor
 varLog <- unlist(lapply(allRestaurant, is.character))
@@ -496,7 +496,7 @@ restMixPCA <- PCAmix(cuantitativas, cualitativas, rename.level = TRUE, graph = F
 restMixPCA$eig # el 90% de la varianza se acumula en el componente 16
 
 #Se corre nuevamente para 16 dimensiones que es donde se acumula más del 90% de la varianza
-restMixPCA <- PCAmix(cuantitativas, cualitativas, rename.level = TRUE, graph = FALSE, ndim = 16)
+restMixPCA <- PCAmix(cuantitativas, cualitativas, rename.level = TRUE, graph = FALSE, ndim = 18)
 
 allRestScores <- data.frame(restMixPCA$scores.stand)
 head(allRestScores)
@@ -553,17 +553,12 @@ ggplot(data = data.frame(t(cstats.table(dfGowerDist, clustDianaDiv, 15))),
 
 **Análisis de la Silueta**  
 
-En función de los resultados obtenidos en el codo anterior se determina K optimo igual 5
+En función de los resultados obtenidos en el codo anterior se determina K optimo igual 4
 ```{r Evaluación: Diana - Silueta }
-clusDiana <- eclust(x = dfGowerDist, FUNcluster = "diana", k = 5, seed = 123,
+clusDiana <- eclust(x = dfGowerDist, FUNcluster = "diana", k = 4, seed = 123,
                       hc_metric = "euclidean", nstart = 50, graph = FALSE)
 fviz_silhouette(sil.obj = clusDiana, print.summary = TRUE, palette = "jco",
                 ggtheme = theme_classic())
-```
-Se muestra gráficamente dentro del dendograma la distribución de los 5 clusters  
-```{r Evaluación: Diana Dendograma}
-pltree(clustDianaDiv, hang=-1, cex = 0.6)
-rect.hclust(clustDianaDiv, k = 5, border = 2:10)
 ```
 
 #### 4.2.2 Modelo: Diana con PCAMix
@@ -671,9 +666,9 @@ ggplot(data = data.frame(t(cstats.table(dfGowerDistPCA, clustHclustAgglPCA, 15))
 ```
 
 **Análisis de la Silueta**
-En función de los resultados obtenidos en el codo anterior se determina K optimo igual 6
+En función de los resultados obtenidos en el codo anterior se determina K optimo igual 3
 ```{r Evaluación: hclust - Silueta (PCAMix)}
-clusHclustPCA <- eclust(x = dfGowerDistPCA, FUNcluster = "hclust", k = 6, seed = 123,
+clusHclustPCA <- eclust(x = dfGowerDistPCA, FUNcluster = "hclust", k = 3, seed = 123,
                       hc_metric = "euclidean", nstart = 50, graph = FALSE)
 fviz_silhouette(sil.obj = clusHclustPCA, print.summary = TRUE, palette = "jco",
                 ggtheme = theme_classic())
@@ -683,12 +678,12 @@ fviz_silhouette(sil.obj = clusHclustPCA, print.summary = TRUE, palette = "jco",
 A partir de los resultados de la silueta obtenidos para Diana y Hclust con y sin PCAMix concluimos que el mejor modelo es hclust sin PCAMix para K=4 obteniendo una silueta de 0.45
 
 ```{r hclust: Cortar el arbol}
-groupsHclust <- as.factor(cutree(clustHclustAggl, k=4))
-summary(groupsHclust)
+groups <- as.factor(cutree(clustDianaDiv, k=4))
+summary(groups)
 ```
 Se le agregara al dataset los nombres de los restaurantes
 ```{r Nombre: Restaurantes}
-allRestaurant$clusterHclust <- groupsHclust
+allRestaurant$cluster <- groups
 
 restName <- geoplaces[,c("placeID","name")]
 allRestaurant <- left_join(x = allRestaurant,y = restName,by = "placeID",all = TRUE)
@@ -696,11 +691,30 @@ head(allRestaurant)
 ```
 
 
-```{r Grafico Cluster Var numericas}
-fviz_cluster(list(data = allRestNum, cluster = groupsHclust))
+### 4.3	Caracterice y describa los resultados a los cuales se arribaron en el caso anterior, desde el punto de vista del negocio.
+
+Se muestra gráficamente dentro del dendograma la distribución de los 4 clusters  
+
+```{r Evaluación: Diana Dendograma}
+pltree(clustDianaDiv, hang=-1, cex = 0.6)
+rect.hclust(clustDianaDiv, k = 4, border = 2:10)
 ```
 
-### 4.3	Caracterice y describa los resultados a los cuales se arribaron en el caso anterior, desde el punto de vista del negocio.
+```{r Ploteo de resultados}
+# classCity
+# foodCount
+# TypeCuisine
+# payCount
+#cluster
+
+plot(allRestaurant$classCity,allRestaurant$cluster)
+
+
+# library(Lock5Data)
+# plot(Happiness,LifeExpectancy,pch=19,col="red")
+```
+
+
 
 Se exportan los datos del resultado en un archivo csv para ser cargado a la base de datos del sistema que gestiona la pagina web. 
 ```{r}
@@ -713,7 +727,9 @@ write.csv(allRestaurant,file="allRestaurantCSV.csv")
 En función de lo transmitido en el requerimiento el usuario debería ingresar el nombre de un restaurante y el sitio web le devolvería los restaurantes similares en función del análisis de clusters realizado 
 
 #### 5.2	En base a lo anterior, ¿cómo debería ser la implementación de este modelo (estimación resultados en tiempo real, procesamiento batch, etc)?
-Dentro de los tipos de implementación vistos en clase este modelo se podría clasificar como un análisis puntual que no precisa ser corrido con frecuencia. De todas formas sería importante cada cierto tiempo ir enriqueciendo las bases con información de los restaurantes y más aún cuando debimos trabajar solo con 130 registros por no contar con información relevante para los restantes.
+Dentro de los tipos de implementación vistos en clase este modelo se podría clasificar como un análisis puntual que no precisa ser corrido con frecuencia. De todas formas sería importante cada cierto tiempo ir enriqueciendo las bases con información de los restaurantes y más aún cuando debimos trabajar solo con 130 registros por no contar con información relevante para los restantes.  
+
+Implementaremos el modelo a conectándonos con una base de datos y actualizando los resultados de las predicciones por ID cada vez que hay una nueva corrida. Se guardarán los resultados en un csv se realizará una conexión a la base de datos y guardaremos las predicciones de los modelos en una tabla y columna específica.
 
 #### 5.3	¿Cómo se podrían armar, usando los resultados de este modelo, los rankings de restoranes “en términos relativos” o “específicos a un grupo”? Si bien no es necesario realizar los desarrollos, identifique el proceso, actividades, variables a utilizar, etc y describa con el mayor detalle posible.
 Los resultados del modelo se deberían mostrar en la web al ingresar el nombre de un restaurante por parte del usuario devolviendo todos los registros correspondientes a ese cluster. Entendemos que el cliente nos debería especificar el criterio para mostrar los restaurantes correspondientes a ese cluster pero sugerimos hacerlo por distancia de gower comenzado por la que tenga una menor, considerando que una menor distancia implica mayor similitud entre los mismos. 
